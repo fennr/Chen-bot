@@ -11,7 +11,7 @@ from models.db import DatabaseModel
 logger = logging.getLogger(__name__)
 
 if t.TYPE_CHECKING:
-    from models import SnedBot
+    from models import ChenBot
 
 
 class DatabaseCache:
@@ -21,8 +21,8 @@ class DatabaseCache:
     or setting it.
     """
 
-    def __init__(self, bot: SnedBot) -> None:
-        self.bot: SnedBot = bot
+    def __init__(self, bot: ChenBot) -> None:
+        self.bot: ChenBot = bot
         self._cache: t.Dict[str, t.List[t.Dict[str, t.Any]]] = {}
         self.is_ready: bool = False
 

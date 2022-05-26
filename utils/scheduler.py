@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 if typing.TYPE_CHECKING:
-    from models.bot import SnedBot
+    from models.bot import ChenBot
 
 
 class ConversionMode(enum.IntEnum):
@@ -38,8 +38,8 @@ class Scheduler:
     Essentially the internal scheduler of the bot.
     """
 
-    def __init__(self, bot: SnedBot) -> None:
-        self.bot: SnedBot = bot
+    def __init__(self, bot: ChenBot) -> None:
+        self.bot: ChenBot = bot
         self._current_timer: t.Optional[Timer] = None  # Currently active timer that is being awaited
         self._current_task: t.Optional[asyncio.Task] = None  # Current task that is handling current_timer
         self._timer_loop: IntervalLoop = IntervalLoop(self._wait_for_active_timers, hours=1.0)
@@ -131,15 +131,18 @@ class Scheduler:
                 "y": 86400 * 365,
             }
             time_word_dict = {
-                "hour": 3600,
-                "second": 1,
-                "minute": 60,
-                "day": 86400,
-                "week": 86400 * 7,
-                "month": 86400 * 30,
-                "year": 86400 * 365,
-                "sec": 1,
-                "min": 60,
+                "час": 3600,
+                "секунд": 1,
+                "минут": 60,
+                "день": 86400,
+                "дня": 86400,
+                "дней": 86400,
+                "неделя": 86400 * 7,
+                "неделю": 86400 * 7,
+                "месяц": 86400 * 30,
+                "год": 86400 * 365,
+                "сек": 1,
+                "мин": 60,
             }
             matches = time_regex.findall(timestr)
             time = 0
