@@ -268,12 +268,6 @@ hikari = {git = "https://github.com/HyperGH/hikari", branch = "master"}
 [package.extras]
 docs = ["furo (>=2022.1.2,<2022.2.0)", "sphinx (==4.4.0)"]
 
-[package.source]
-type = "git"
-url = "https://github.com/HyperGH/hikari-miru.git"
-reference = "cursed/branch"
-resolved_reference = "498cc0b5d084e2a940f2fec7f6ca582eebe79f90"
-
 [[package]]
 name = "idna"
 version = "3.3"
