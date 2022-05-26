@@ -230,7 +230,7 @@ speedups = ["aiodns (>=3.0,<4.0)", "cchardet (>=2.1,<3.0)", "Brotli (>=1.0,<2.0)
 
 [[package]]
 name = "hikari"
-version = "2.0.0.dev108"
+version = "2.0.0.dev107"
 description = "A sane Discord API for Python 3 built on asyncio and good intentions"
 category = "main"
 optional = false
