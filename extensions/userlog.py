@@ -11,7 +11,7 @@ import lightbulb
 
 from etc import constants as const
 from etc import get_perm_str
-from models import SnedBot
+from models import ChenBot
 from models.events import AutoModMessageFlagEvent
 from models.events import MassBanEvent
 from models.events import RoleButtonCreateEvent
@@ -20,12 +20,12 @@ from models.events import RoleButtonUpdateEvent
 from models.events import WarnCreateEvent
 from models.events import WarnRemoveEvent
 from models.events import WarnsClearEvent
-from models.plugin import SnedPlugin
+from models.plugin import ChenPlugin
 from utils import helpers
 
 logger = logging.getLogger(__name__)
 
-userlog = SnedPlugin("Logging", include_datastore=True)
+userlog = ChenPlugin("Logging", include_datastore=True)
 
 # Functions exposed to other extensions & plugins
 userlog.d.actions = lightbulb.utils.DataStore()
@@ -292,7 +292,7 @@ async def find_auditlog_data(
                 # We do not want to return entries older than 15 seconds
                 if (helpers.utcnow() - entry.id.created_at).total_seconds() > 30 or count >= 5:
                     return
-
+                print(entry)
                 if user_id and user_id == entry.target_id:
                     return entry
                 elif user_id:
@@ -392,11 +392,11 @@ def create_log_content(message: hikari.PartialMessage, max_length: t.Optional[in
     """
     contents = message.content
     if message.attachments:
-        contents = f"{contents}\n//The message contained one or more attachments."
+        contents = f"{contents}\n//Сообщение содержит одно или более вложений"
     if message.embeds:
-        contents = f"{contents}\n//The message contained one or more embeds."
+        contents = f"{contents}\n//Сообщение содержит один или более embed'ов"
     if not contents:  # idk how this is possible, but it somehow is sometimes
-        contents = "//The message did not contain text."
+        contents = "//Сообщение не содержит текста"
     if max_length and len(contents) > max_length:
         return contents[: max_length - 3] + "..."
 
@@ -421,7 +421,7 @@ def strip_bot_reason(reason: t.Optional[str]) -> t.Tuple[t.Optional[str], t.Opti
 
 
 @userlog.listener(hikari.GuildMessageDeleteEvent, bind=True)
-async def message_delete(plugin: SnedPlugin, event: hikari.GuildMessageDeleteEvent) -> None:
+async def message_delete(plugin: ChenPlugin, event: hikari.GuildMessageDeleteEvent) -> None:
     if not event.old_message or event.old_message.author.is_bot:
         return
 
@@ -437,28 +437,28 @@ async def message_delete(plugin: SnedPlugin, event: hikari.GuildMessageDeleteEve
         assert moderator is not None
 
         embed = hikari.Embed(
-            title=f"🗑️ Message deleted by Moderator",
-            description=f"""**Message author:** `{event.old_message.author} ({event.old_message.author.id})`
-**Moderator:** `{moderator} ({moderator.id})`
-**Channel:** <#{event.channel_id}>
-**Message content:** ```{contents}```""",
+            title=f"🗑️ Сообщение удалено модератором",
+            description=f"""**Автор:** `{event.old_message.author} ({event.old_message.author.id})`
+**Модератор:** `{moderator} ({moderator.id})`
+**Канал:** <#{event.channel_id}>
+**Текст сообщения:** ```{contents}```""",
             color=const.ERROR_COLOR,
         )
         await log("message_delete_mod", embed, event.guild_id)
 
     else:
         embed = hikari.Embed(
-            title=f"🗑️ Message deleted",
-            description=f"""**Message author:** `{event.old_message.author} ({event.old_message.author.id})`
-**Channel:** <#{event.channel_id}>
-**Message content:** ```{contents}```""",
+            title=f"🗑️ Сообщение удалено",
+            description=f"""**Автор:** `{event.old_message.author} ({event.old_message.author.id})`
+**Канал:** <#{event.channel_id}>
+**Текст сообщения:** ```{contents}```""",
             color=const.ERROR_COLOR,
         )
         await log("message_delete", embed, event.guild_id)
 
 
 @userlog.listener(hikari.GuildMessageUpdateEvent, bind=True)
-async def message_update(plugin: SnedPlugin, event: hikari.GuildMessageUpdateEvent) -> None:
+async def message_update(plugin: ChenPlugin, event: hikari.GuildMessageUpdateEvent) -> None:
     if not event.old_message or not event.old_message.author or event.old_message.author.is_bot:
         return
 
@@ -473,10 +473,10 @@ async def message_update(plugin: SnedPlugin, event: hikari.GuildMessageUpdateEve
     new_content = create_log_content(event.message, max_length=1800)
 
     embed = hikari.Embed(
-        title=f"🖊️ Message edited",
-        description=f"""**Message author:** `{event.author} ({event.author_id})`
-**Channel:** <#{event.channel_id}>
-**Before:** ```{old_content}``` \n**After:** ```{new_content}```
+        title=f"🖊️ Сообщение отредактировано",
+        description=f"""**Автор сообщения:** `{event.author} ({event.author_id})`
+**Канал:** <#{event.channel_id}>
+**До:** ```{old_content}``` \n**После:** ```{new_content}```
 [Jump!]({event.message.make_link(event.guild_id)})""",
         color=const.EMBED_BLUE,
     )
@@ -484,7 +484,7 @@ async def message_update(plugin: SnedPlugin, event: hikari.GuildMessageUpdateEve
 
 
 @userlog.listener(hikari.GuildBulkMessageDeleteEvent, bind=True)
-async def bulk_message_delete(plugin: SnedPlugin, event: hikari.GuildBulkMessageDeleteEvent) -> None:
+async def bulk_message_delete(plugin: ChenPlugin, event: hikari.GuildBulkMessageDeleteEvent) -> None:
 
     moderator = "Discord"
     entry = await find_auditlog_data(event, event_type=hikari.AuditLogEventType.MESSAGE_BULK_DELETE)
@@ -495,32 +495,32 @@ async def bulk_message_delete(plugin: SnedPlugin, event: hikari.GuildBulkMessage
     channel = event.get_channel()
 
     embed = hikari.Embed(
-        title=f"🗑️ Bulk message deletion",
-        description=f"""**Channel:** {channel.mention if channel else 'Unknown'}
-**Moderator:** `{moderator}`
-```Multiple messages have been purged.```""",
+        title=f"🗑️ Массовое удаление сообщений",
+        description=f"""**Канал:** {channel.mention if channel else 'Unknown'}
+**Модератор:** `{moderator}`
+```Массовое удаление успешно выполнено```""",
         color=const.ERROR_COLOR,
     )
     await log("bulk_delete", embed, event.guild_id)
 
 
 @userlog.listener(hikari.RoleDeleteEvent, bind=True)
-async def role_delete(plugin: SnedPlugin, event: hikari.RoleDeleteEvent) -> None:
+async def role_delete(plugin: ChenPlugin, event: hikari.RoleDeleteEvent) -> None:
 
     entry = await find_auditlog_data(event, event_type=hikari.AuditLogEventType.ROLE_DELETE)
     if entry and event.old_role:
         assert entry.user_id is not None
         moderator = plugin.app.cache.get_member(event.guild_id, entry.user_id)
         embed = hikari.Embed(
-            title=f"🗑️ Role deleted",
-            description=f"**Role:** `{event.old_role}`\n**Moderator:** `{moderator}`",
+            title=f"🗑️ Role удалена",
+            description=f"**Роль:** `{event.old_role}`\n**Модератор:** `{moderator}`",
             color=const.ERROR_COLOR,
         )
         await log("roles", embed, event.guild_id)
 
 
 @userlog.listener(hikari.RoleCreateEvent, bind=True)
-async def role_create(plugin: SnedPlugin, event: hikari.RoleCreateEvent) -> None:
+async def role_create(plugin: ChenPlugin, event: hikari.RoleCreateEvent) -> None:
 
     entry = await find_auditlog_data(event, event_type=hikari.AuditLogEventType.ROLE_CREATE)
     if entry and event.role:
@@ -528,14 +528,14 @@ async def role_create(plugin: SnedPlugin, event: hikari.RoleCreateEvent) -> None
         moderator = plugin.app.cache.get_member(event.guild_id, entry.user_id)
         embed = hikari.Embed(
             title=f"❇️ Role created",
-            description=f"**Role:** `{event.role}`\n**Moderator:** `{moderator}`",
+            description=f"**Роль:** `{event.role}`\n**Модератор:** `{moderator}`",
             color=const.EMBED_GREEN,
         )
         await log("roles", embed, event.guild_id)
 
 
 @userlog.listener(hikari.RoleUpdateEvent, bind=True)
-async def role_update(plugin: SnedPlugin, event: hikari.RoleUpdateEvent) -> None:
+async def role_update(plugin: ChenPlugin, event: hikari.RoleUpdateEvent) -> None:
 
     entry = await find_auditlog_data(event, event_type=hikari.AuditLogEventType.ROLE_UPDATE)
     if entry and event.old_role:
@@ -554,49 +554,49 @@ async def role_update(plugin: SnedPlugin, event: hikari.RoleUpdateEvent) -> None
         diff = await get_diff(event.guild_id, event.old_role, event.role, attrs)
         perms_diff = await get_perms_diff(event.old_role, event.role)
         if not diff and not perms_diff:
-            diff = "Changes could not be resolved."
+            diff = "Изменения не могут быть разрешены"
 
-        perms_str = f"\nPermissions:\n {perms_diff}" if perms_diff else ""
+        perms_str = f"\nПрава:\n {perms_diff}" if perms_diff else ""
         embed = hikari.Embed(
-            title=f"🖊️ Role updated",
-            description=f"""**Role:** `{event.role.name}` \n**Moderator:** `{moderator}`\n**Changes:**```ansi\n{diff}{perms_str}```""",
+            title=f"🖊️ Роль обновлена",
+            description=f"""**Роль:** `{event.role.name}` \n**Модератор:** `{moderator}`\n**Изменения:**```ansi\n{diff}{perms_str}```""",
             color=const.EMBED_BLUE,
         )
         await log("roles", embed, event.guild_id)
 
 
 @userlog.listener(hikari.GuildChannelDeleteEvent, bind=True)
-async def channel_delete(plugin: SnedPlugin, event: hikari.GuildChannelDeleteEvent) -> None:
+async def channel_delete(plugin: ChenPlugin, event: hikari.GuildChannelDeleteEvent) -> None:
 
     entry = await find_auditlog_data(event, event_type=hikari.AuditLogEventType.CHANNEL_DELETE)
     if entry and event.channel:
         assert entry.user_id is not None
         moderator = plugin.app.cache.get_member(event.guild_id, entry.user_id)
         embed = hikari.Embed(
-            title=f"#️⃣ Channel deleted",
-            description=f"**Channel:** `{event.channel.name}` `({event.channel.type.name})`\n**Moderator:** `{moderator}` {f'`({moderator.id})`' if moderator else ''}",  # type: ignore
+            title=f"#️⃣ Канал удален",
+            description=f"**Канал:** `{event.channel.name}` `({event.channel.type.name})`\n**Модератор:** `{moderator}` {f'`({moderator.id})`' if moderator else ''}",  # type: ignore
             color=const.ERROR_COLOR,
         )
         await log("channels", embed, event.guild_id)
 
 
 @userlog.listener(hikari.GuildChannelCreateEvent, bind=True)
-async def channel_create(plugin: SnedPlugin, event: hikari.GuildChannelCreateEvent) -> None:
+async def channel_create(plugin: ChenPlugin, event: hikari.GuildChannelCreateEvent) -> None:
 
     entry = await find_auditlog_data(event, event_type=hikari.AuditLogEventType.CHANNEL_CREATE)
     if entry and event.channel:
         assert entry.user_id is not None
         moderator = plugin.app.cache.get_member(event.guild_id, entry.user_id)
         embed = hikari.Embed(
-            title=f"#️⃣ Channel created",
-            description=f"**Channel:** {event.channel.mention} `({event.channel.type.name})`\n**Moderator:** `{moderator}` {f'`({moderator.id})`' if moderator else ''}",  # type: ignore
+            title=f"#️⃣ Канал создан",
+            description=f"**Канал:** {event.channel.mention} `({event.channel.type.name})`\n**Модератор:** `{moderator}` {f'`({moderator.id})`' if moderator else ''}",  # type: ignore
             color=const.EMBED_GREEN,
         )
         await log("channels", embed, event.guild_id)
 
 
 @userlog.listener(hikari.GuildChannelUpdateEvent, bind=True)
-async def channel_update(plugin: SnedPlugin, event: hikari.GuildChannelUpdateEvent) -> None:
+async def channel_update(plugin: ChenPlugin, event: hikari.GuildChannelUpdateEvent) -> None:
 
     entry = await find_auditlog_data(event, event_type=hikari.AuditLogEventType.CHANNEL_UPDATE)
 
@@ -632,18 +632,18 @@ async def channel_update(plugin: SnedPlugin, event: hikari.GuildChannelUpdateEve
         if event.old_channel.permission_overwrites != event.channel.permission_overwrites:
             diff = f"{diff}\nChannel overrides have been modified."
 
-        diff = diff or "Changes could not be resolved."
+        diff = diff or "Изменения не могут быть разрешены"
 
         embed = hikari.Embed(
-            title=f"#️⃣ Channel updated",
-            description=f"Channel {event.channel.mention} was updated by `{moderator}` {f'`({moderator.id})`' if moderator else ''}.\n**Changes:**\n```ansi\n{diff}```",
+            title=f"#️⃣ Канал обновлен",
+            description=f"Канал {event.channel.mention} обновлен `{moderator}` {f'`({moderator.id})`' if moderator else ''}.\n**Изменения:**\n```ansi\n{diff}```",
             color=const.EMBED_BLUE,
         )
         await log("channels", embed, event.guild_id)
 
 
 @userlog.listener(hikari.GuildUpdateEvent, bind=True)
-async def guild_update(plugin: SnedPlugin, event: hikari.GuildUpdateEvent) -> None:
+async def guild_update(plugin: ChenPlugin, event: hikari.GuildUpdateEvent) -> None:
 
     entry = await find_auditlog_data(event, event_type=hikari.AuditLogEventType.GUILD_UPDATE)
 
@@ -690,18 +690,18 @@ async def guild_update(plugin: SnedPlugin, event: hikari.GuildUpdateEvent) -> No
             "nsfw_level": "NSFW Level",
         }
         diff = await get_diff(event.guild_id, event.old_guild, event.guild, attrs)
-        diff = diff or "Changes could not be resolved."
+        diff = diff or "Изменения не могут быть разрешены"
 
         embed = hikari.Embed(
-            title=f"🖊️ Guild updated",
-            description=f"Guild settings have been updated by `{moderator}`.\n**Changes:**\n```ansi\n{diff}```",
+            title=f"🖊️ Сервер обновлен",
+            description=f"Настройки сервера обновлены `{moderator}`.\n**Изменения:**\n```ansi\n{diff}```",
             color=const.EMBED_BLUE,
         )
         await log("guild_settings", embed, event.guild_id)
 
 
 @userlog.listener(hikari.BanDeleteEvent, bind=True)
-async def member_ban_remove(plugin: SnedPlugin, event: hikari.BanDeleteEvent) -> None:
+async def member_ban_remove(plugin: ChenPlugin, event: hikari.BanDeleteEvent) -> None:
 
     entry = await find_auditlog_data(
         event, event_type=hikari.AuditLogEventType.MEMBER_BAN_REMOVE, user_id=event.user.id
@@ -709,51 +709,51 @@ async def member_ban_remove(plugin: SnedPlugin, event: hikari.BanDeleteEvent) ->
     if entry:
         assert entry.user_id is not None
         moderator = plugin.app.cache.get_member(event.guild_id, entry.user_id) if entry else "Unknown"
-        reason: t.Optional[str] = entry.reason or "No reason provided"
+        reason: t.Optional[str] = entry.reason or "Причина не выбрана"
     else:
         moderator = "Error"
-        reason = "Unable to view audit logs! Please ensure the bot has the necessary permissions to view them!"
+        reason = "Невозможно просмотреть журналы аудита! Убедитесь, что у бота есть необходимые разрешения для их просмотра!"
 
     if isinstance(moderator, hikari.Member) and moderator.id == plugin.app.user_id:
         reason, moderator = strip_bot_reason(reason)
         moderator = moderator or plugin.app.get_me()
 
     embed = hikari.Embed(
-        title=f"🔨 User unbanned",
-        description=f"**Offender:** `{event.user} ({event.user.id})`\n**Moderator:**`{moderator}`\n**Reason:** ```{reason}```",
+        title=f"🔨 Пользователь разбанен",
+        description=f"**Пользователь:** `{event.user} ({event.user.id})`\n**Модератор:**`{moderator}`\n**Причина:** ```{reason}```",
         color=const.EMBED_GREEN,
     )
     await log("ban", embed, event.guild_id)
-    await plugin.app.mod.add_note(event.user, event.guild_id, f"🔨 **Unbanned by {moderator}:** {reason}")
+    await plugin.app.mod.add_note(event.user, event.guild_id, f"🔨 **Разбанен {moderator}:** {reason}")
 
 
 @userlog.listener(hikari.BanCreateEvent, bind=True)
-async def member_ban_add(plugin: SnedPlugin, event: hikari.BanCreateEvent) -> None:
+async def member_ban_add(plugin: ChenPlugin, event: hikari.BanCreateEvent) -> None:
 
     entry = await find_auditlog_data(event, event_type=hikari.AuditLogEventType.MEMBER_BAN_ADD, user_id=event.user.id)
     if entry:
         assert entry.user_id is not None
         moderator = plugin.app.cache.get_member(event.guild_id, entry.user_id) if entry else "Unknown"
-        reason: t.Optional[str] = entry.reason or "No reason provided"
+        reason: t.Optional[str] = entry.reason or "Причина не выбрана"
     else:
         moderator = "Unknown"
-        reason = "Unable to view audit logs! Please ensure the bot has the necessary permissions to view them!"
+        reason = "Невозможно просмотреть журналы аудита! Убедитесь, что у бота есть необходимые разрешения для их просмотра!"
 
     if isinstance(moderator, hikari.Member) and moderator.id == plugin.app.user_id:
         reason, moderator = strip_bot_reason(reason)
         moderator = moderator or plugin.app.get_me()
 
     embed = hikari.Embed(
-        title=f"🔨 User banned",
-        description=f"**Offender:** `{event.user} ({event.user.id})`\n**Moderator:**`{moderator}`\n**Reason:**```{reason}```",
+        title=f"🔨 Пользователь забанен",
+        description=f"**Пользователь:** `{event.user} ({event.user.id})`\n**Модератор:**`{moderator}`\n**Причина:**```{reason}```",
         color=const.ERROR_COLOR,
     )
     await log("ban", embed, event.guild_id)
-    await plugin.app.mod.add_note(event.user, event.guild_id, f"🔨 **Banned by {moderator}:** {reason}")
+    await plugin.app.mod.add_note(event.user, event.guild_id, f"🔨 **Забанен {moderator}:** {reason}")
 
 
 @userlog.listener(hikari.MemberDeleteEvent, bind=True)
-async def member_delete(plugin: SnedPlugin, event: hikari.MemberDeleteEvent) -> None:
+async def member_delete(plugin: ChenPlugin, event: hikari.MemberDeleteEvent) -> None:
 
     if event.user_id == plugin.app.user_id:
         return  # RIP
@@ -763,39 +763,39 @@ async def member_delete(plugin: SnedPlugin, event: hikari.MemberDeleteEvent) -> 
     if entry:  # This is a kick
         assert entry.user_id is not None
         moderator = plugin.app.cache.get_member(event.guild_id, entry.user_id) if entry else "Unknown"
-        reason: t.Optional[str] = entry.reason or "No reason provided"
+        reason: t.Optional[str] = entry.reason or "Причина не указана"
 
         if isinstance(moderator, hikari.Member) and moderator.id == plugin.app.user_id:
             reason, moderator = strip_bot_reason(reason)
             moderator = moderator or plugin.app.get_me()
 
         embed = hikari.Embed(
-            title=f"🚪👈 User was kicked",
-            description=f"**Offender:** `{event.user} ({event.user.id})`\n**Moderator:**`{moderator}`\n**Reason:**```{reason}```",
+            title=f"🚪👈 Пользователь кикнут",
+            description=f"**Пользователь:** `{event.user} ({event.user.id})`\n**Модератор:**`{moderator}`\n**Причина:**```{reason}```",
             color=const.ERROR_COLOR,
         )
         await log("kick", embed, event.guild_id)
-        await plugin.app.mod.add_note(event.user, event.guild_id, f"🚪👈 **Kicked by {moderator}:** {reason}")
+        await plugin.app.mod.add_note(event.user, event.guild_id, f"🚪👈 **Кикнут {moderator}:** {reason}")
         return
 
     embed = hikari.Embed(
-        title=f"🚪 User left",
-        description=f"**User:** `{event.user} ({event.user.id})`\n**User count:** `{len(plugin.app.cache.get_members_view_for_guild(event.guild_id))}`",
+        title=f"🚪 Пользователь ушел",
+        description=f"**Пользователь:** `{event.user} ({event.user.id})`\n**Всего пользователей:** `{len(plugin.app.cache.get_members_view_for_guild(event.guild_id))}`",
         color=const.ERROR_COLOR,
     )
     await log("member_leave", embed, event.guild_id)
 
 
 @userlog.listener(hikari.MemberCreateEvent, bind=True)
-async def member_create(plugin: SnedPlugin, event: hikari.MemberCreateEvent) -> None:
+async def member_create(plugin: ChenPlugin, event: hikari.MemberCreateEvent) -> None:
 
     embed = hikari.Embed(
-        title=f"🚪 User joined",
-        description=f"**User:** `{event.member} ({event.member.id})`\n**User count:** `{len(plugin.app.cache.get_members_view_for_guild(event.guild_id))}`",
+        title=f"🚪 Пользователь присоединился",
+        description=f"**Пользователь:** `{event.member} ({event.member.id})`\n**Всего пользователей:** `{len(plugin.app.cache.get_members_view_for_guild(event.guild_id))}`",
         color=const.EMBED_GREEN,
     )
     embed.add_field(
-        name="Account created",
+        name="Аккаунт создан",
         value=f"{helpers.format_dt(event.member.created_at)} ({helpers.format_dt(event.member.created_at, style='R')})",
         inline=False,
     )
@@ -804,7 +804,7 @@ async def member_create(plugin: SnedPlugin, event: hikari.MemberCreateEvent) -> 
 
 
 @userlog.listener(hikari.MemberUpdateEvent, bind=True)
-async def member_update(plugin: SnedPlugin, event: hikari.MemberUpdateEvent) -> None:
+async def member_update(plugin: ChenPlugin, event: hikari.MemberUpdateEvent) -> None:
 
     if not event.old_member:
         return
@@ -835,27 +835,27 @@ async def member_update(plugin: SnedPlugin, event: hikari.MemberUpdateEvent) -> 
 
         if comms_disabled_until is None:
             embed = hikari.Embed(
-                title=f"🔉 User timeout removed",
-                description=f"**User:** `{member} ({member.id})` \n**Moderator:** `{moderator}` \n**Reason:** ```{reason}```",
+                title=f"🔉 Тайм-аут пользователя снят",
+                description=f"**Пользователь:** `{member} ({member.id})` \n**Модератор:** `{moderator}` \n**Причина:** ```{reason}```",
                 color=const.EMBED_GREEN,
             )
-            await plugin.app.mod.add_note(event.user, event.guild_id, f"🔉 **Timeout removed by {moderator}:** {reason}")
+            await plugin.app.mod.add_note(event.user, event.guild_id, f"🔉 **Тайм-аут снят {moderator}:** {reason}")
 
         else:
             assert comms_disabled_until is not None
 
             embed = hikari.Embed(
-                title=f"🔇 User timed out",
-                description=f"""**User:** `{member} ({member.id})`
-**Moderator:** `{moderator}` 
-**Until:** {helpers.format_dt(comms_disabled_until)} ({helpers.format_dt(comms_disabled_until, style='R')})
-**Reason:** ```{reason}```""",
+                title=f"🔇 Пользователь в тайм-ауте",
+                description=f"""**Пользователь:** `{member} ({member.id})`
+**Модератор:** `{moderator}` 
+**До:** {helpers.format_dt(comms_disabled_until)} ({helpers.format_dt(comms_disabled_until, style='R')})
+**Причина:** ```{reason}```""",
                 color=const.ERROR_COLOR,
             )
             await plugin.app.mod.add_note(
                 event.user,
                 event.guild_id,
-                f"🔇 **Timed out by {moderator} until {helpers.format_dt(comms_disabled_until)}:** {reason}",
+                f"🔇 **Тайм-аут от {moderator} до {helpers.format_dt(comms_disabled_until)}:** {reason}",
             )
 
         await log("timeout", embed, event.guild_id)
@@ -863,8 +863,8 @@ async def member_update(plugin: SnedPlugin, event: hikari.MemberUpdateEvent) -> 
     elif old_member.nickname != member.nickname:
         """Nickname change handling"""
         embed = hikari.Embed(
-            title=f"🖊️ Nickname changed",
-            description=f"**User:** `{member} ({member.id})`\nNickname before: `{old_member.nickname}`\nNickname after: `{member.nickname}`",
+            title=f"🖊️ Никнейм изменен",
+            description=f"**Пользователь:** `{member} ({member.id})`\nПрошлый ник: `{old_member.nickname}`\nТекущий ник: `{member.nickname}`",
             color=const.EMBED_BLUE,
         )
         await log("nickname", embed, event.guild_id)
@@ -886,9 +886,9 @@ async def member_update(plugin: SnedPlugin, event: hikari.MemberUpdateEvent) -> 
         entry = await find_auditlog_data(
             event, event_type=hikari.AuditLogEventType.MEMBER_ROLE_UPDATE, user_id=event.user.id
         )
-
+        logger.info(entry)
         moderator = plugin.app.cache.get_member(event.guild_id, entry.user_id) if entry and entry.user_id else "Unknown"
-        reason: t.Optional[str] = entry.reason if entry else "No reason provided."
+        reason: t.Optional[str] = entry.reason if entry else "Причина не указана"
 
         if isinstance(moderator, (hikari.Member)) and moderator.is_bot:
             # Do not log role updates done by ourselves or other bots
@@ -896,71 +896,71 @@ async def member_update(plugin: SnedPlugin, event: hikari.MemberUpdateEvent) -> 
 
         if add_diff:
             embed = hikari.Embed(
-                title=f"🖊️ Member roles updated",
-                description=f"**User:** `{member} ({member.id})`\n**Moderator:** `{moderator}`\n**Role added:** <@&{add_diff[0]}>",
+                title=f"🖊️ Владельцы роли обновлены",
+                description=f"**Пользователь:** `{member} ({member.id})`\n**Модератор:** `{moderator}`\n**Роль добавлена:** <@&{add_diff[0]}>",
                 color=const.EMBED_BLUE,
             )
             await log("roles", embed, event.guild_id)
 
         elif rem_diff:
             embed = hikari.Embed(
-                title=f"🖊️ Member roles updated",
-                description=f"**User:** `{member} ({member.id})`\n**Moderator:** `{moderator}`\n**Role removed:** <@&{rem_diff[0]}>",
+                title=f"🖊️ Владельцы роли обновлены",
+                description=f"**Пользователь:** `{member} ({member.id})`\n**Модератор:** `{moderator}`\n**Роль удалена:** <@&{rem_diff[0]}>",
                 color=const.EMBED_BLUE,
             )
             await log("roles", embed, event.guild_id)
 
 
 @userlog.listener(WarnCreateEvent, bind=True)
-async def warn_create(plugin: SnedPlugin, event: WarnCreateEvent) -> None:
+async def warn_create(plugin: ChenPlugin, event: WarnCreateEvent) -> None:
 
     embed = hikari.Embed(
-        title="⚠️ Warning issued",
-        description=f"**{event.member}** has been warned by **{event.moderator}**.\n**Warns:** {event.warn_count}\n**Reason:** ```{event.reason}```",
+        title="⚠️ Выдано предупреждение",
+        description=f"**{event.member}** предупрежден **{event.moderator}**.\n**Предупреждений:** {event.warn_count}\n**Причина:** ```{event.reason}```",
         color=const.WARN_COLOR,
     )
 
     await log("warn", embed, event.guild_id)
 
     await plugin.app.mod.add_note(
-        event.member, event.member.guild_id, f"⚠️ **Warned by {event.moderator}:** {event.reason}"
+        event.member, event.member.guild_id, f"⚠️ **Предупреждение от {event.moderator}:** {event.reason}"
     )
 
 
 @userlog.listener(WarnRemoveEvent, bind=True)
-async def warn_remove(plugin: SnedPlugin, event: WarnRemoveEvent) -> None:
+async def warn_remove(plugin: ChenPlugin, event: WarnRemoveEvent) -> None:
 
     embed = hikari.Embed(
-        title="⚠️ Warning removed",
-        description=f"A warning was removed from **{event.member}** by **{event.moderator}**.\n**Warns:** {event.warn_count}\n**Reason:** ```{event.reason}```",
+        title="⚠️ Предупреждение удалено",
+        description=f"Предупреждение снято с **{event.member}** модератором **{event.moderator}**.\n**Предупреждений:** {event.warn_count}\n**Причина:** ```{event.reason}```",
         color=const.EMBED_GREEN,
     )
 
     await log("warn", embed, event.guild_id)
 
     await plugin.app.mod.add_note(
-        event.member, event.member.guild_id, f"⚠️ **1 Warning removed by {event.moderator}:** {event.reason}"
+        event.member, event.member.guild_id, f"⚠️ **1 Предупреждение снято {event.moderator}:** {event.reason}"
     )
 
 
 @userlog.listener(WarnsClearEvent, bind=True)
-async def warns_clear(plugin: SnedPlugin, event: WarnsClearEvent) -> None:
+async def warns_clear(plugin: ChenPlugin, event: WarnsClearEvent) -> None:
 
     embed = hikari.Embed(
-        title="⚠️ Warnings cleared",
-        description=f"Warnings cleared for **{event.member}** by **{event.moderator}**.\n**Reason:** ```{event.reason}```",
+        title="⚠️ Предупреждения удалены",
+        description=f"Предупреждения удалены с **{event.member}** модератором **{event.moderator}**.\n**Причина:** ```{event.reason}```",
         color=const.EMBED_GREEN,
     )
 
     await log("warn", embed, event.guild_id)
 
     await plugin.app.mod.add_note(
-        event.member, event.member.guild_id, f"⚠️ **Warnings cleared for {event.moderator}:** {event.reason}"
+        event.member, event.member.guild_id, f"⚠️ **Предупреждения удалены {event.moderator}:** {event.reason}"
     )
 
 
 @userlog.listener(AutoModMessageFlagEvent, bind=True)
-async def flag_message(plugin: SnedPlugin, event: AutoModMessageFlagEvent) -> None:
+async def flag_message(plugin: ChenPlugin, event: AutoModMessageFlagEvent) -> None:
 
     user_id = hikari.Snowflake(event.user)
 
@@ -976,8 +976,8 @@ async def flag_message(plugin: SnedPlugin, event: AutoModMessageFlagEvent) -> No
     )
 
     embed = hikari.Embed(
-        title="❗🚩 Message flagged",
-        description=f"**{user}** `({user.id})` was flagged by auto-moderator for suspicious behaviour.\n**Reason:**```{reason}```\n**Content:** ```{content}```\n\n[Jump to message!]({event.message.make_link(event.guild_id)})",
+        title="❗🚩 Сообщение помечено",
+        description=f"**{user}** `({user.id})` was flagged by auto-moderator for suspicious behaviour.\n**Причина:**```{reason}```\n**Content:** ```{content}```\n\n[Jump to message!]({event.message.make_link(event.guild_id)})",
         color=const.ERROR_COLOR,
     )
     await log("flags", embed, event.guild_id)
@@ -987,8 +987,8 @@ async def flag_message(plugin: SnedPlugin, event: AutoModMessageFlagEvent) -> No
 async def massban_execute(event: MassBanEvent) -> None:
 
     log_embed = hikari.Embed(
-        title="🔨 Smartban concluded",
-        description=f"Banned **{event.successful}/{event.total}** users.\n**Moderator:** `{event.moderator} ({event.moderator.id})`\n**Reason:** ```{event.reason}```",
+        title="🔨 Выполнен массбан",
+        description=f"Забанены **{event.successful}/{event.total}** пользователей.\n**Модератор:** `{event.moderator} ({event.moderator.id})`\n**Причина:** ```{event.reason}```",
         color=const.ERROR_COLOR,
     )
     await log("ban", log_embed, event.guild_id, file=event.users_file, bypass=True)
@@ -999,8 +999,8 @@ async def rolebutton_create(event: RoleButtonCreateEvent) -> None:
     moderator = f"{event.moderator} ({event.moderator.id})" if event.moderator else "Unknown"
 
     log_embed = hikari.Embed(
-        title="❇️ Rolebutton Added",
-        description=f"**ID:** {event.rolebutton.id}\n**Channel:** <#{event.rolebutton.channel_id}>\n**Role:** <@&{event.rolebutton.role_id}>\n**Moderator:** `{moderator}`",
+        title="❇️ Кнопка с ролью добавлена",
+        description=f"**ID:** {event.rolebutton.id}\n**Канал:** <#{event.rolebutton.channel_id}>\n**Роль:** <@&{event.rolebutton.role_id}>\n**Модератор:** `{moderator}`",
         color=const.EMBED_GREEN,
     )
     await log("roles", log_embed, event.guild_id)
@@ -1011,8 +1011,8 @@ async def rolebutton_delete(event: RoleButtonDeleteEvent) -> None:
     moderator = f"{event.moderator} ({event.moderator.id})" if event.moderator else "Unknown"
 
     log_embed = hikari.Embed(
-        title="🗑️ Rolebutton Deleted",
-        description=f"**ID:** {event.rolebutton.id}\n**Channel:** <#{event.rolebutton.channel_id}>\n**Role:** <@&{event.rolebutton.role_id}>\n**Moderator:** `{moderator}`",
+        title="🗑️ Кнопка с ролью удалена",
+        description=f"**ID:** {event.rolebutton.id}\n**Канал:** <#{event.rolebutton.channel_id}>\n**Роль:** <@&{event.rolebutton.role_id}>\n**Модератор:** `{moderator}`",
         color=const.ERROR_COLOR,
     )
     await log("roles", log_embed, event.guild_id)
@@ -1023,19 +1023,19 @@ async def rolebutton_update(event: RoleButtonUpdateEvent) -> None:
     moderator = f"{event.moderator} ({event.moderator.id})" if event.moderator else "Unknown"
 
     log_embed = hikari.Embed(
-        title="🖊️ Rolebutton Updated",
-        description=f"**ID:** {event.rolebutton.id}\n**Channel:** <#{event.rolebutton.channel_id}>\n**Role:** <@&{event.rolebutton.role_id}>\n**Moderator:** `{moderator}`",
+        title="🖊️ Кнопка с ролью обновлена",
+        description=f"**ID:** {event.rolebutton.id}\n**Канал:** <#{event.rolebutton.channel_id}>\n**Роль:** <@&{event.rolebutton.role_id}>\n**Модератор:** `{moderator}`",
         color=const.EMBED_BLUE,
     )
     await log("roles", log_embed, event.guild_id)
 
 
-def load(bot: SnedBot) -> None:
+def load(bot: ChenBot) -> None:
     bot.add_plugin(userlog)
     userlog.d._task = bot.create_task(_iter_queue())
 
 
-def unload(bot: SnedBot) -> None:
+def unload(bot: ChenBot) -> None:
     if userlog.d._task:
         userlog.d._task.cancel()
     bot.remove_plugin(userlog)
