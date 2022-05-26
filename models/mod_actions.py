@@ -25,7 +25,7 @@ from models.views import AuthorOnlyNavigator
 from utils import helpers
 
 if t.TYPE_CHECKING:
-    from models.bot import SnedBot
+    from models.bot import ChenBot
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ class ModActions:
     """Class containing all moderation actions that can be performed by the bot.
     It also handles miscallaneous moderation tasks such as tempban timers, timeout chunks & more."""
 
-    def __init__(self, bot: SnedBot) -> None:
+    def __init__(self, bot: ChenBot) -> None:
         self.app = bot
         self.app.subscribe(TimerCompleteEvent, self.timeout_extend)
         self.app.subscribe(hikari.MemberCreateEvent, self.reapply_timeout_extensions)
@@ -111,23 +111,23 @@ class ModActions:
         guild_id = hikari.Snowflake(guild)
         settings = await self.get_settings(guild_id)
         types_conj = {
-            ActionType.WARN: "warned in",
-            ActionType.TIMEOUT: "timed out in",
-            ActionType.KICK: "kicked from",
-            ActionType.BAN: "banned from",
-            ActionType.SOFTBAN: "soft-banned from",
-            ActionType.TEMPBAN: "temp-banned from",
+            ActionType.WARN: "Предупреждение на",
+            ActionType.TIMEOUT: "Тайм-аут на",
+            ActionType.KICK: "Кик на",
+            ActionType.BAN: "Бан на",
+            ActionType.SOFTBAN: "Софт бан на",
+            ActionType.TEMPBAN: "Временный бан на",
         }
 
         if settings.flags & ModerationFlags.DM_USERS_ON_PUNISH and isinstance(target, hikari.Member):
             gateway_guild = self.app.cache.get_guild(guild_id)
             assert isinstance(gateway_guild, hikari.GatewayGuild)
-            guild_name = gateway_guild.name if gateway_guild else "Unknown server"
+            guild_name = gateway_guild.name if gateway_guild else "Сервер не определен"
             try:
                 await target.send(
                     embed=hikari.Embed(
-                        title=f"❗ You have been {types_conj[action_type]} **{guild_name}**",
-                        description=f"You have been {types_conj[action_type]} **{guild_name}**.\n**Reason:** ```{reason}```",
+                        title=f"❗ **Внимание**",
+                        description=f"{types_conj[action_type]} **{guild_name}**.\n**Причина:** ```{reason}```",
                         color=const.ERROR_COLOR,
                     )
                 )
@@ -158,8 +158,8 @@ class ModActions:
         if moderator_id != event.user.id:
             await event.context.respond(
                 embed=hikari.Embed(
-                    title="❌ Action prohibited",
-                    description="This action is only available to the moderator who executed the command.",
+                    title="❌ Действие запрещено",
+                    description="Это действие доступно только модератору, выполнившему команду",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -176,8 +176,8 @@ class ModActions:
             if not helpers.includes_permissions(perms, hikari.Permissions.BAN_MEMBERS):
                 await event.context.respond(
                     embed=hikari.Embed(
-                        title="❌ Missing Permissions",
-                        description="You do not have the required permissions to unban members.",
+                        title="❌ Отсутствуют разрешения",
+                        description="У вас нет необходимых разрешений для разблокировки пользователей",
                         color=const.ERROR_COLOR,
                     ),
                     flags=hikari.MessageFlag.EPHEMERAL,
@@ -188,7 +188,7 @@ class ModActions:
             embed = await self.unban(
                 user,
                 event.member,
-                reason=helpers.format_reason("Unbanned via quick-action button.", moderator=event.member),
+                reason=helpers.format_reason("Разбан по кнопке быстрого действия", moderator=event.member),
             )
             await event.context.respond(embed=embed, flags=hikari.MessageFlag.EPHEMERAL)
 
@@ -202,8 +202,8 @@ class ModActions:
             else:
                 await event.context.respond(
                     embed=hikari.Embed(
-                        title="📒 Journal entries for this user:",
-                        description=f"There are no journal entries for this user yet. Any moderation-actions will leave an entry here, or you can set one manually with `/journal add {event.user}`",
+                        title="📒 Записи журнала для этого пользователя",
+                        description=f"Для этого пользователя нет записей в журнале. Модерационные действия оставят тут запись или ее можно внести командой `/journal add {event.user}`",
                         color=const.EMBED_BLUE,
                     ),
                     flags=hikari.MessageFlag.EPHEMERAL,
@@ -255,7 +255,7 @@ class ModActions:
                 )
                 await member.edit(
                     communication_disabled_until=helpers.utcnow() + datetime.timedelta(seconds=MAX_TIMEOUT_SECONDS),
-                    reason="Automatic timeout extension applied.",
+                    reason="Применено автоматическое продление времени",
                 )
 
             else:
@@ -263,7 +263,7 @@ class ModActions:
                     seconds=expiry - round(helpers.utcnow().timestamp())
                 )
                 await member.edit(
-                    communication_disabled_until=timeout_for, reason="Automatic timeout extension applied."
+                    communication_disabled_until=timeout_for, reason="Применено автоматическое продление времени"
                 )
 
         else:
@@ -307,13 +307,13 @@ class ModActions:
             )
             await event.member.edit(
                 communication_disabled_until=helpers.utcnow() + datetime.timedelta(seconds=MAX_TIMEOUT_SECONDS),
-                reason="Automatic timeout extension applied.",
+                reason="Применено автоматическое продление времени",
             )
 
         else:
             await event.member.edit(
                 communication_disabled_until=expiry,
-                reason="Automatic timeout extension applied.",
+                reason="Применено автоматическое продление времени",
             )
 
     async def remove_timeout_extensions(self, event: hikari.MemberUpdateEvent):
@@ -353,9 +353,9 @@ class ModActions:
             return
 
         try:
-            await guild.unban(event.timer.user_id, reason="User unbanned: Tempban expired.")
+            await guild.unban(event.timer.user_id, reason="Пользователь разблокирован: срок временного бана истек")
         except Exception as e:
-            logger.info(f"Failed unbanning {event.timer.user_id} from {event.timer.guild_id}: {e.__class__}: {e}")
+            logger.info(f"Ошибка разбана {event.timer.user_id} от {event.timer.guild_id}: {e.__class__}: {e}")
 
     async def get_notes(
         self, user: hikari.SnowflakeishOr[hikari.PartialUser], guild: hikari.SnowflakeishOr[hikari.Guild]
@@ -446,14 +446,14 @@ class ModActions:
         reason = helpers.format_reason(reason, max_length=1000)
 
         embed = hikari.Embed(
-            title="⚠️ Warning issued",
-            description=f"**{member}** has been warned by **{moderator}**.\n**Reason:** ```{reason}```",
+            title="⚠️ Выдано предупреждение",
+            description=f"**{member}** предупрежден **{moderator}**.\n**Причина:** ```{reason}```",
             color=const.WARN_COLOR,
         )
         try:
             await self.pre_mod_actions(member.guild_id, member, ActionType.WARN, reason)
         except DMFailedError:
-            embed.set_footer("Failed sending DM to user.")
+            embed.set_footer("Невозможно отправить сообщение пользователю")
 
         userlog = self.app.get_plugin("Logging")
         assert userlog is not None
@@ -490,8 +490,8 @@ class ModActions:
         await self.app.dispatch(WarnsClearEvent(self.app, member.guild_id, member, moderator, db_user.warns, reason))
 
         return hikari.Embed(
-            title="✅ Warnings cleared",
-            description=f"**{member}**'s warnings have been cleared.\n**Reason:** ```{reason}```",
+            title="✅ Предупреждения сняты",
+            description=f"**{member}** предупреждения были сняты.\n**Причина:** ```{reason}```",
             color=const.EMBED_GREEN,
         )
 
@@ -518,8 +518,8 @@ class ModActions:
 
         if db_user.warns <= 0:
             return hikari.Embed(
-                title="❌ No Warnings",
-                description=f"This user has no warnings!",
+                title="❌ Нет предупреждений",
+                description=f"У этого пользователя нет предупреждений",
                 color=const.ERROR_COLOR,
             )
 
@@ -531,8 +531,8 @@ class ModActions:
         await self.app.dispatch(WarnRemoveEvent(self.app, member.guild_id, member, moderator, db_user.warns, reason))
 
         return hikari.Embed(
-            title="✅ Warning removed",
-            description=f"Warning removed from **{member}**.\n**Current count:** `{db_user.warns}`\n**Reason:** ```{reason}```",
+            title="✅ Предупреждение снято",
+            description=f"Предупреждение снято с **{member}**.\n**Текущее количество:** `{db_user.warns}`\n**Причина:** ```{reason}```",
             color=const.EMBED_GREEN,
         )
 
@@ -570,15 +570,15 @@ class ModActions:
         helpers.can_harm(me, member, hikari.Permissions.MODERATE_MEMBERS, raise_error=True)
 
         embed = hikari.Embed(
-            title="🔇 " + "User timed out",
-            description=f"**{member}** has been timed out until {helpers.format_dt(duration)}.\n**Reason:** ```{raw_reason}```",
+            title="🔇 " + "Пользователь отправлен в тайм-аут",
+            description=f"**{member}** в таймауте до {helpers.format_dt(duration)}.\n**Причина:** ```{raw_reason}```",
             color=const.ERROR_COLOR,
         )
 
         try:
             await self.pre_mod_actions(member.guild_id, member, ActionType.TIMEOUT, reason=raw_reason)
         except DMFailedError:
-            embed.set_footer("Failed sending DM to user.")
+            embed.set_footer("Ошибка отправки сообщения пользователю")
 
         if duration > helpers.utcnow() + datetime.timedelta(seconds=MAX_TIMEOUT_SECONDS):
             await self.app.scheduler.create_timer(
@@ -657,7 +657,7 @@ class ModActions:
         RuntimeError
             Both soft & tempban were specified.
         """
-        reason = reason or "No reason provided."
+        reason = reason or "Причина не указана"
 
         if duration and soft:
             raise RuntimeError("Ban type cannot be soft when a duration is specified.")
@@ -674,7 +674,7 @@ class ModActions:
             raise RoleHierarchyError
 
         if duration:
-            reason = f"[TEMPBAN] Banned until: {duration} (UTC)  |  {reason}"
+            reason = f"[TEMPBAN] Забанен до: {duration} (UTC)  |  {reason}"
 
         elif soft:
             reason = f"[SOFTBAN] {reason}"
@@ -683,8 +683,8 @@ class ModActions:
         reason = helpers.format_reason(reason, moderator, max_length=512)
 
         embed = hikari.Embed(
-            title="🔨 User banned",
-            description=f"**{user}** has been banned.\n**Reason:** ```{raw_reason}```",
+            title="🔨 Пользователь забанен",
+            description=f"**{user}** был забанен.\n**Причина:** ```{raw_reason}```",
             color=const.ERROR_COLOR,
         )
 
@@ -692,7 +692,7 @@ class ModActions:
             try:
                 await self.pre_mod_actions(moderator.guild_id, user, ActionType.BAN, reason=raw_reason)
             except DMFailedError:
-                embed.set_footer("Failed sending DM to user.")
+                embed.set_footer("Ошибка отправки сообщения пользователю")
 
             await self.app.rest.ban_user(moderator.guild_id, user.id, delete_message_days=days_to_delete, reason=reason)
 
@@ -706,7 +706,7 @@ class ModActions:
                 await self.app.scheduler.cancel_timer(record.get("id"), moderator.guild_id)
 
             if soft:
-                await self.app.rest.unban_user(moderator.guild_id, user.id, reason="Automatic unban by softban.")
+                await self.app.rest.unban_user(moderator.guild_id, user.id, reason="Автоматическая разблокировка после софтбана")
 
             elif duration:
                 await self.app.scheduler.create_timer(
@@ -718,8 +718,8 @@ class ModActions:
 
         except (hikari.ForbiddenError, hikari.HTTPError):
             return hikari.Embed(
-                title="❌ Ban failed",
-                description="This could be due to a configuration or network error. Please try again later.",
+                title="❌ Ошибка",
+                description="Это может быть связано с ошибкой сети. Повторите попытку позднее",
                 color=const.ERROR_COLOR,
             )
 
@@ -759,21 +759,21 @@ class ModActions:
         try:
             await self.app.rest.unban_user(moderator.guild_id, user.id, reason=reason)
             return hikari.Embed(
-                title="🔨 User unbanned",
-                description=f"**{user}** has been unbanned.\n**Reason:** ```{raw_reason}```",
+                title="🔨 Пользователь разбанен",
+                description=f"**{user}** был разбанен.\n**Причина:** ```{raw_reason}```",
                 color=const.EMBED_GREEN,
             )
         except (hikari.HTTPError, hikari.ForbiddenError, hikari.NotFoundError) as e:
             if isinstance(e, hikari.NotFoundError):
                 return hikari.Embed(
-                    title="❌ Unban failed",
-                    description="This user does not appear to be banned!",
+                    title="❌ Ошибка",
+                    description="Этот пользователь не забанен",
                     color=const.ERROR_COLOR,
                 )
 
             return hikari.Embed(
-                title="❌ Unban failed",
-                description="This could be due to a configuration or network error. Please try again later.",
+                title="❌ Ошибка",
+                description="Это может быть связано с проблемами с сетью. Повторите попытку позднее",
                 color=const.ERROR_COLOR,
             )
 
@@ -801,7 +801,7 @@ class ModActions:
             The response embed to display to the user. May include any
             potential input errors.
         """
-        raw_reason = reason or "No reason provided."
+        raw_reason = reason or "Причина не указана"
         reason = helpers.format_reason(reason, moderator, max_length=512)
 
         me = self.app.cache.get_member(member.guild_id, self.app.user_id)
@@ -810,8 +810,8 @@ class ModActions:
         helpers.can_harm(me, member, hikari.Permissions.MODERATE_MEMBERS, raise_error=True)
 
         embed = hikari.Embed(
-            title="🚪👈 User kicked",
-            description=f"**{member}** has been kicked.\n**Reason:** ```{raw_reason}```",
+            title="🚪👈 Пользователь кикнут",
+            description=f"**{member}** был кикнут.\n**Причина:** ```{raw_reason}```",
             color=const.ERROR_COLOR,
         )
 
@@ -819,7 +819,7 @@ class ModActions:
             try:
                 await self.pre_mod_actions(member.guild_id, member, ActionType.KICK, reason=raw_reason)
             except DMFailedError:
-                embed.set_footer("Failed sending DM to user.")
+                embed.set_footer("Ошибка отправки сообщения пользователю")
 
             await self.app.rest.kick_user(member.guild_id, member, reason=reason)
             await self.post_mod_actions(member.guild_id, member, ActionType.KICK, reason=raw_reason)
@@ -827,8 +827,8 @@ class ModActions:
 
         except (hikari.ForbiddenError, hikari.HTTPError):
             return hikari.Embed(
-                title="❌ Kick failed",
-                description="This could be due to a configuration or network error. Please try again later.",
+                title="❌ Ошибка",
+                description="Это может быть связано с проблемами с сетью. Повторите попытку позднее",
                 color=const.ERROR_COLOR,
             )
 

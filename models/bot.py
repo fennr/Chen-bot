@@ -28,7 +28,7 @@ async def get_prefix(bot: lightbulb.BotApp, message: hikari.Message) -> t.Union[
     """
     Get custom prefix for guild to show prefix command deprecation warn
     """
-    assert isinstance(bot, SnedBot)
+    assert isinstance(bot, ChenBot)
     if message.guild_id is None:
         return "sn "
 
@@ -65,7 +65,7 @@ async def is_not_blacklisted(ctx: SnedContext) -> bool:
     raise UserBlacklistedError("User is blacklisted from using the application.")
 
 
-class SnedBot(lightbulb.BotApp):
+class ChenBot(lightbulb.BotApp):
     """A customized subclass of lightbulb.BotApp
 
     Parameters
@@ -222,24 +222,24 @@ class SnedBot(lightbulb.BotApp):
         self,
         event: hikari.InteractionCreateEvent,
         command: lightbulb.SlashCommand,
-        cls: t.Type[lightbulb.SlashContext] = SnedSlashContext,
-    ) -> SnedSlashContext:
+        cls: t.Type[lightbulb.SlashContext] = ChenSlashContext,
+    ) -> ChenSlashContext:
         return await super().get_slash_context(event, command, cls)  # type: ignore
 
     async def get_user_context(
         self,
         event: hikari.InteractionCreateEvent,
         command: lightbulb.UserCommand,
-        cls: t.Type[lightbulb.UserContext] = SnedUserContext,
-    ) -> SnedUserContext:
+        cls: t.Type[lightbulb.UserContext] = ChenUserContext,
+    ) -> ChenUserContext:
         return await super().get_user_context(event, command, cls)  # type: ignore
 
     async def get_message_context(
         self,
         event: hikari.InteractionCreateEvent,
         command: lightbulb.MessageCommand,
-        cls: t.Type[lightbulb.MessageContext] = SnedMessageContext,
-    ) -> SnedMessageContext:
+        cls: t.Type[lightbulb.MessageContext] = ChenMessageContext,
+    ) -> ChenMessageContext:
         return await super().get_message_context(event, command, cls)  # type: ignore
 
     async def get_prefix_context(
@@ -274,7 +274,7 @@ class SnedBot(lightbulb.BotApp):
         self._user_id = user.id if user else None
 
         logging.info(f"Startup complete, initialized as {user}.")
-        activity = hikari.Activity(name="@Sned", type=hikari.ActivityType.LISTENING)
+        activity = hikari.Activity(name="@Chen", type=hikari.ActivityType.LISTENING)
         await self.update_presence(activity=activity)
 
         if self.dev_mode:
@@ -319,7 +319,7 @@ class SnedBot(lightbulb.BotApp):
                 await event.message.respond(
                     embed=hikari.Embed(
                         title="Beep Boop!",
-                        description="Use `/` to access my commands and see what I can do!",
+                        description="Используй `/` для доступа к моим командам!",
                         color=0xFEC01D,
                     ).set_thumbnail(user.avatar_url if user else None)
                 )
@@ -331,8 +331,8 @@ class SnedBot(lightbulb.BotApp):
                 user = self.get_me()
                 await event.message.respond(
                     embed=hikari.Embed(
-                        title="Uh Oh!",
-                        description="This bot has transitioned to slash commands, to see a list of all commands, type `/`!\nIf you have any questions, or feel lost, feel free to join the [support server](https://discord.gg/KNKr8FPmJa)!",
+                        title="О нет!",
+                        description="Этот бот использует только слеш-команды `/`!\nЕсли у вас есть вопросы можно написать мне на [Samuro dev сервер](https://discord.gg/qxy6WE9cke)!",
                         color=const.ERROR_COLOR,
                     ).set_thumbnail(user.avatar_url if user else None)
                 )
@@ -359,8 +359,8 @@ class SnedBot(lightbulb.BotApp):
         try:
             await channel.send(
                 embed=hikari.Embed(
-                    title="Beep Boop!",
-                    description="""I have been summoned to this server. Type `/` to see what I can do!\n\nIf you have `Manage Server` permissions, you may configure the bot via `/settings`!""",
+                    title="10001110001!",
+                    description="""Привет. Я был призван на этот сервер. Набери `/` чтобы посмотреть что я умею!\n\nЕсли у тебя есть права на настройку сервера набери `/settings`!""",
                     color=0xFEC01D,
                 ).set_thumbnail(me.avatar_url)
             )

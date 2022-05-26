@@ -12,7 +12,7 @@ import hikari
 from models.errors import DatabaseStateConflictError
 
 if t.TYPE_CHECKING:
-    from models.bot import SnedBot
+    from models.bot import ChenBot
     from utils.cache import DatabaseCache
 
 logger = logging.getLogger(__name__)
@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 class Database:
     """A database object that wraps an asyncpg pool and provides additional methods for convenience."""
 
-    def __init__(self, app: SnedBot) -> None:
-        self._app: SnedBot = app
+    def __init__(self, app: ChenBot) -> None:
+        self._app: ChenBot = app
         self._user = os.getenv("POSTGRES_USER") or "postgres"
         self._host = os.getenv("POSTGRES_HOST") or "sned-db"
         self._db_name = os.getenv("POSTGRES_DB") or "sned"
@@ -36,7 +36,7 @@ class Database:
         DatabaseModel._app = self.app
 
     @property
-    def app(self) -> SnedBot:
+    def app(self) -> ChenBot:
         """The currently running application."""
         return self._app
 
@@ -298,7 +298,7 @@ class DatabaseModel(abc.ABC):
     """Common base-class for all database model objects."""
 
     _db: Database
-    _app: SnedBot
+    _app: ChenBot
     _db_cache: DatabaseCache
 
 

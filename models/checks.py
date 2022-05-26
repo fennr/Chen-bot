@@ -141,7 +141,6 @@ def has_permissions(perm1: hikari.Permissions, *perms: hikari.Permissions) -> li
     reduced = functools.reduce(operator.or_, [perm1, *perms])
     return lightbulb.Check(functools.partial(_has_permissions, perms=reduced))
 
-
 def bot_has_permissions(perm1: hikari.Permissions, *perms: hikari.Permissions) -> lightbulb.Check:
     """Just a shitty attempt at making bot_has_guild_permissions fetch the channel if it is not present."""
     reduced = functools.reduce(operator.or_, [perm1, *perms])

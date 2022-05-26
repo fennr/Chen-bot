@@ -8,7 +8,7 @@ import hikari
 from models.timer import Timer
 
 if t.TYPE_CHECKING:
-    from models.bot import SnedBot
+    from models.bot import ChenBot
     from models.rolebutton import RoleButton
 
 
@@ -25,7 +25,7 @@ class SnedGuildEvent(SnedEvent):
     Base event for any custom event that occurs within the context of a guild.
     """
 
-    app: SnedBot
+    app: ChenBot
     _guild_id: hikari.Snowflakeish
 
     @property
@@ -74,7 +74,7 @@ class TimerCompleteEvent(SnedGuildEvent):
     Dispatched when a scheduled timer has expired.
     """
 
-    app: SnedBot
+    app: ChenBot
     timer: Timer
     _guild_id: hikari.Snowflakeish
 
@@ -85,7 +85,7 @@ class MassBanEvent(SnedGuildEvent):
     Dispatched when a massban occurs.
     """
 
-    app: SnedBot
+    app: ChenBot
     _guild_id: hikari.Snowflakeish
     moderator: hikari.Member
     total: int
@@ -100,7 +100,7 @@ class WarnEvent(SnedGuildEvent):
     Base class for all warning events.
     """
 
-    app: SnedBot
+    app: ChenBot
     _guild_id: hikari.Snowflakeish
     member: hikari.Member
     moderator: hikari.Member
@@ -141,7 +141,7 @@ class AutoModMessageFlagEvent(SnedGuildEvent):
     Dispatched when a message is flagged by auto-mod.
     """
 
-    app: SnedBot
+    app: ChenBot
     message: hikari.PartialMessage
     user: hikari.PartialUser
     _guild_id: hikari.Snowflakeish
@@ -154,7 +154,7 @@ class RoleButtonEvent(SnedGuildEvent):
     Base class for all rolebutton-related events.
     """
 
-    app: SnedBot
+    app: ChenBot
     _guild_id: hikari.Snowflakeish
     rolebutton: RoleButton
     moderator: t.Optional[hikari.PartialUser] = None

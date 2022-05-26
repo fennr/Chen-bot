@@ -32,8 +32,8 @@ class AuthorOnlyView(miru.View):
         if ctx.user.id != self.lctx.author.id:
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Oops!",
-                    description="A magical barrier is stopping you from interacting with this component menu!",
+                    title="❌ Ошибка",
+                    description="Магический барьер мешает использовать это меню компонентов",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -83,8 +83,8 @@ class AuthorOnlyNavigator(SnedNavigator):
         if ctx.user.id != self.lctx.author.id:
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Oops!",
-                    description="A magical barrier is stopping you from interacting with this navigation menu!",
+                    title="❌ Ошибка",
+                    description="Магический барьер мешает использовать это меню компонентов",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,

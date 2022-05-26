@@ -10,10 +10,10 @@ from models.mod_actions import ModerationFlags
 
 from .views import AuthorOnlyView
 
-__all__ = ["SnedContext", "SnedSlashContext", "SnedMessageContext", "SnedUserContext", "SnedPrefixContext"]
+__all__ = ["SnedContext", "ChenSlashContext", "ChenMessageContext", "ChenUserContext", "SnedPrefixContext"]
 
 if t.TYPE_CHECKING:
-    from .bot import SnedBot
+    from .bot import ChenBot
 
 
 class ConfirmView(AuthorOnlyView):
@@ -167,23 +167,23 @@ class SnedContext(lightbulb.Context):
         return await self.respond(*args, flags=flags, **kwargs)
 
     @property
-    def app(self) -> SnedBot:
+    def app(self) -> ChenBot:
         return super().app  # type: ignore
 
     @property
-    def bot(self) -> SnedBot:
+    def bot(self) -> ChenBot:
         return super().bot  # type: ignore
 
 
-class SnedSlashContext(SnedContext, lightbulb.SlashContext):
+class ChenSlashContext(SnedContext, lightbulb.SlashContext):
     """Custom SlashContext for Sned."""
 
 
-class SnedUserContext(SnedContext, lightbulb.UserContext):
+class ChenUserContext(SnedContext, lightbulb.UserContext):
     """Custom UserContext for Sned."""
 
 
-class SnedMessageContext(SnedContext, lightbulb.MessageContext):
+class ChenMessageContext(SnedContext, lightbulb.MessageContext):
     """Custom MessageContext for Sned."""
 
 

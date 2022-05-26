@@ -157,7 +157,7 @@ class BackButton(OptionButton):
     """Go back to page that ctx.parent is set to."""
 
     def __init__(self, parent: str, **kwargs) -> None:
-        super().__init__(style=hikari.ButtonStyle.PRIMARY, custom_id=parent, label="Back", emoji="⬅️")
+        super().__init__(style=hikari.ButtonStyle.PRIMARY, custom_id=parent, label="Назад", emoji="⬅️")
         self.kwargs = kwargs
 
     async def callback(self, context: miru.ViewContext) -> None:
@@ -172,13 +172,13 @@ class QuitButton(OptionButton):
     """Quit settings, delete message."""
 
     def __init__(self) -> None:
-        super().__init__(style=hikari.ButtonStyle.DANGER, label="Quit", emoji="⬅️")
+        super().__init__(style=hikari.ButtonStyle.DANGER, label="Выход", emoji="⬅️")
 
     async def callback(self, context: miru.ViewContext) -> None:
         self.view.last_ctx = context
         self.view.last_item = self
         self.view.value = None
-        await self.view.menu_actions["Quit"]()
+        await self.view.menu_actions["Выход"]()
         self.view.input_event.set()
 
 

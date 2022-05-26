@@ -5,21 +5,21 @@ import typing as t
 import lightbulb
 
 if t.TYPE_CHECKING:
-    from models.bot import SnedBot
+    from models.bot import ChenBot
 
 
-class SnedPlugin(lightbulb.Plugin):
+class ChenPlugin(lightbulb.Plugin):
     @property
-    def app(self) -> SnedBot:
+    def app(self) -> ChenBot:
         return super().app  # type: ignore
 
     @app.setter
-    def app(self, val: SnedBot) -> None:
+    def app(self, val: ChenBot) -> None:
         self._app = val
         self.create_commands()
 
     @property
-    def bot(self) -> SnedBot:
+    def bot(self) -> ChenBot:
         return super().bot  # type: ignore
 
 
