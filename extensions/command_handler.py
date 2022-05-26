@@ -12,19 +12,19 @@ import lightbulb
 from etc import constants as const
 from etc.perms_str import get_perm_str
 from models import SnedContext
-from models.bot import SnedBot
+from models.bot import ChenBot
 from models.context import SnedPrefixContext
-from models.context import SnedSlashContext
+from models.context import ChenSlashContext
 from models.errors import BotRoleHierarchyError
 from models.errors import MemberExpectedError
 from models.errors import RoleHierarchyError
 from models.errors import UserBlacklistedError
-from models.plugin import SnedPlugin
+from models.plugin import ChenPlugin
 from utils import helpers
 
 logger = logging.getLogger(__name__)
 
-ch = SnedPlugin("Command Handler")
+ch = ChenPlugin("Command Handler")
 
 
 async def log_exc_to_channel(
@@ -61,7 +61,7 @@ async def log_exc_to_channel(
     for line in error_lines:
         paginator.add_line(line)
 
-    assert isinstance(ch.app, SnedBot)
+    assert isinstance(ch.app, ChenBot)
     channel_id = ch.app.config.ERROR_LOGGING_CHANNEL
 
     if not channel_id:
@@ -112,6 +112,17 @@ async def application_error_handler(ctx: SnedContext, error: lightbulb.Lightbulb
             return
 
     # These may be raised outside of a check too
+    if isinstance(error, lightbulb.MissingRequiredRole):
+        await ctx.respond(
+            embed=hikari.Embed(
+                title="❌ Недостаточно прав",
+                description=f"Необходимо иметь определенную роль для доступа к данной команде",
+                color=const.ERROR_COLOR,
+            ),
+            flags=hikari.MessageFlag.EPHEMERAL,
+        )
+        return
+
     if isinstance(error, lightbulb.MissingRequiredPermission):
         await ctx.respond(
             embed=hikari.Embed(
@@ -269,7 +280,7 @@ async def application_error_handler(ctx: SnedContext, error: lightbulb.Lightbulb
 @ch.listener(lightbulb.MessageCommandErrorEvent)
 @ch.listener(lightbulb.SlashCommandErrorEvent)
 async def application_command_error_handler(event: lightbulb.CommandErrorEvent) -> None:
-    assert isinstance(event.context, SnedSlashContext)
+    assert isinstance(event.context, ChenSlashContext)
     await application_error_handler(event.context, event.exception)
 
 
@@ -316,7 +327,7 @@ async def prefix_command_invoke_listener(event: lightbulb.PrefixCommandInvocatio
         return
 
     if event.context.guild_id:
-        assert isinstance(event.app, SnedBot)
+        assert isinstance(event.app, ChenBot)
         me = event.app.cache.get_member(event.context.guild_id, event.app.user_id)
         assert me is not None
 
@@ -335,11 +346,11 @@ async def event_error_handler(event: hikari.ExceptionEvent) -> None:
     await log_exc_to_channel(exception_msg, event=event)
 
 
-def load(bot: SnedBot) -> None:
+def load(bot: ChenBot) -> None:
     bot.add_plugin(ch)
 
 
-def unload(bot: SnedBot) -> None:
+def unload(bot: ChenBot) -> None:
     bot.remove_plugin(ch)
 
 

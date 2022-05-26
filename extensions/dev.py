@@ -15,13 +15,13 @@ from miru.ext import nav
 from etc import constants as const
 from models import AuthorOnlyNavigator
 from models import SnedPrefixContext
-from models.bot import SnedBot
-from models.plugin import SnedPlugin
+from models.bot import ChenBot
+from models.plugin import ChenPlugin
 from models.views import AuthorOnlyView
 
 logger = logging.getLogger(__name__)
 
-dev = SnedPlugin("Development")
+dev = ChenPlugin("Development")
 dev.add_checks(lightbulb.owner_only)
 
 
@@ -229,11 +229,11 @@ async def eval_py(ctx: SnedPrefixContext, code: str) -> None:
             await send_paginated(ctx, ctx.author, traceback_msg, prefix="```py\n", suffix="```")
 
 
-def load(bot: SnedBot) -> None:
+def load(bot: ChenBot) -> None:
     bot.add_plugin(dev)
 
 
-def unload(bot: SnedBot) -> None:
+def unload(bot: ChenBot) -> None:
     bot.remove_plugin(dev)
 
 

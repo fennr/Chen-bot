@@ -9,37 +9,37 @@ import miru
 
 import models
 from etc import constants as const
-from models.bot import SnedBot
+from models.bot import ChenBot
 from models.checks import bot_has_permissions
 from models.checks import has_permissions
 from models.checks import is_above_target
 from models.checks import is_invoker_above_target
-from models.context import SnedSlashContext
-from models.context import SnedUserContext
+from models.context import ChenSlashContext
+from models.context import ChenUserContext
 from models.db_user import DatabaseUser
 from models.events import MassBanEvent
 from models.mod_actions import ModerationFlags
-from models.plugin import SnedPlugin
+from models.plugin import ChenPlugin
 from utils import helpers
 
 logger = logging.getLogger(__name__)
 
-mod = SnedPlugin("Moderation", include_datastore=True)
+mod = ChenPlugin("Moderation", include_datastore=True)
 
 
 @mod.command
-@lightbulb.option("user", "The user to show information about.", type=hikari.User)
-@lightbulb.command("whois", "Show user information about the specified user.", pass_options=True)
+@lightbulb.option("user", "Пользователь", type=hikari.User)
+@lightbulb.command("whois", "Показать информацию о пользователе", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def whois(ctx: SnedSlashContext, user: hikari.User) -> None:
+async def whois(ctx: ChenSlashContext, user: hikari.User) -> None:
     embed = await helpers.get_userinfo(ctx, user)
     await ctx.mod_respond(embed=embed)
 
 
 @mod.command
-@lightbulb.command("Show Userinfo", "Show user information about the target user.", pass_options=True)
+@lightbulb.command("Show Userinfo", "Показать пользовательскую информацию о пользователе", pass_options=True)
 @lightbulb.implements(lightbulb.UserCommand)
-async def whois_user_command(ctx: SnedUserContext, target: hikari.User) -> None:
+async def whois_user_command(ctx: ChenUserContext, target: hikari.User) -> None:
     embed = await helpers.get_userinfo(ctx, target)
     await ctx.respond(embed=embed, flags=hikari.MessageFlag.EPHEMERAL)
 
@@ -50,20 +50,20 @@ async def whois_user_command(ctx: SnedUserContext, target: hikari.User) -> None:
     bot_has_permissions(hikari.Permissions.MANAGE_MESSAGES, hikari.Permissions.READ_MESSAGE_HISTORY),
     has_permissions(hikari.Permissions.MANAGE_MESSAGES),
 )
-@lightbulb.option("user", "Only delete messages authored by this user.", type=hikari.User, required=False)
-@lightbulb.option("regex", "Only delete messages that match with the regular expression.", required=False)
-@lightbulb.option("embeds", "Only delete messages that contain embeds.", type=bool, required=False)
-@lightbulb.option("links", "Only delete messages that contain links.", type=bool, required=False)
-@lightbulb.option("invites", "Only delete messages that contain Discord invites.", type=bool, required=False)
-@lightbulb.option("attachments", "Only delete messages that contain files & images.", type=bool, required=False)
-@lightbulb.option("onlytext", "Only delete messages that exclusively contain text.", type=bool, required=False)
-@lightbulb.option("notext", "Only delete messages that do not contain text.", type=bool, required=False)
-@lightbulb.option("endswith", "Only delete messages that end with the specified text.", required=False)
-@lightbulb.option("startswith", "Only delete messages that start with the specified text.", required=False)
-@lightbulb.option("count", "The amount of messages to delete.", type=int, min_value=1, max_value=100)
-@lightbulb.command("purge", "Purge multiple messages in this channel.")
+@lightbulb.option("user", "Удалить сообщения пользователя", type=hikari.User, required=False)
+@lightbulb.option("regex", "Удалить сообщения, соответствующие регулярному выражению", required=False)
+@lightbulb.option("embeds", "Удалить сообщения, содержащие embed", type=bool, required=False)
+@lightbulb.option("links", "Удалить сообщения, содержащие ссылки", type=bool, required=False)
+@lightbulb.option("invites", "Удалить сообщения, содержащие дискорд-приглашения", type=bool, required=False)
+@lightbulb.option("attachments", "Удалить сообщения, содержащие файлы и изображения", type=bool, required=False)
+@lightbulb.option("onlytext", "Удалить сообщения, в который есть только текст", type=bool, required=False)
+@lightbulb.option("notext", "Удалить сообщения, в которых нет текста", type=bool, required=False)
+@lightbulb.option("endswith", "Удалить сообщения, которые заканчиваются на определенный текст", required=False)
+@lightbulb.option("startswith", "Удалить сообщения, которые начинаются на определенный текст", required=False)
+@lightbulb.option("count", "Количество сообщения для удаления", type=int, min_value=1, max_value=100)
+@lightbulb.command("purge", "Удалить сообщения в данном чате")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def purge(ctx: SnedSlashContext) -> None:
+async def purge(ctx: ChenSlashContext) -> None:
 
     channel = ctx.get_channel() or await ctx.app.rest.fetch_channel(ctx.channel_id)
     assert isinstance(channel, hikari.TextableGuildChannel)
@@ -79,8 +79,8 @@ async def purge(ctx: SnedSlashContext) -> None:
         except re.error as error:
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Invalid regex passed",
-                    description=f"Failed parsing regex: ```{str(error)}```",
+                    title="❌ Некорректный regex",
+                    description=f"Ошибка парсинга регулярного выражения: ```{str(error)}```",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -137,8 +137,8 @@ async def purge(ctx: SnedSlashContext) -> None:
         try:
             await ctx.app.rest.delete_messages(channel, messages)
             embed = hikari.Embed(
-                title="🗑️ Messages purged",
-                description=f"**{len(messages)}** messages have been deleted.",
+                title="🗑️ Сообщения удалены",
+                description=f"Удалено сообщений: **{len(messages)}**",
                 color=const.EMBED_GREEN,
             )
 
@@ -151,8 +151,8 @@ async def purge(ctx: SnedSlashContext) -> None:
             raise error
     else:
         embed = hikari.Embed(
-            title="🗑️ Not found",
-            description=f"No messages matched the specified criteria from the past two weeks!",
+            title="🗑️ Не найдены",
+            description=f"Нет сообщений по заданым критериям за последние 2 недели",
             color=const.ERROR_COLOR,
         )
 
@@ -160,62 +160,18 @@ async def purge(ctx: SnedSlashContext) -> None:
 
 
 @mod.command
-@lightbulb.add_checks(
-    bot_has_permissions(hikari.Permissions.MANAGE_NICKNAMES),
-    has_permissions(hikari.Permissions.MANAGE_NICKNAMES),
-    is_invoker_above_target,
-    is_above_target,
-)
-@lightbulb.option(
-    "strict",
-    "Defaults to True. If enabled, uses stricter filtering and may filter out certain valid letters.",
-    type=bool,
-    required=False,
-)
-@lightbulb.option("user", "The user who's nickname should be deobfuscated.", type=hikari.Member, required=True)
-@lightbulb.command("deobfuscate", "Deobfuscate a user's nickname.", pass_options=True)
-@lightbulb.implements(lightbulb.SlashCommand)
-async def deobfuscate_nick(ctx: SnedSlashContext, user: hikari.Member, strict: bool = True) -> None:
-    helpers.is_member(user)
-
-    new_nick = helpers.normalize_string(user.display_name, strict=strict)
-    if not new_nick:
-        new_nick = "Blessed by Sned"
-
-    if new_nick == user.display_name:
-        await ctx.mod_respond(
-            embed=hikari.Embed(
-                title="ℹ️ No action taken",
-                description=f"The nickname of **{user.display_name}** is already deobfuscated or contains nothing to deobfuscate.",
-                color=const.EMBED_BLUE,
-            )
-        )
-        return
-
-    await user.edit(nick=new_nick, reason=f"{ctx.author} ({ctx.author.id}): Deobfuscated nickname")
-
-    await ctx.mod_respond(
-        embed=hikari.Embed(
-            title="✅ Deobfuscated!",
-            description=f"{user.mention}'s nickname is now: `{new_nick}`",
-            color=const.EMBED_GREEN,
-        )
-    )
-
-
-@mod.command
-@lightbulb.command("journal", "Access and manage the moderation journal.")
+@lightbulb.command("journal", "Доступ и управление журналом модерации")
 @lightbulb.implements(lightbulb.SlashCommandGroup)
-async def journal(ctx: SnedSlashContext) -> None:
+async def journal(ctx: ChenSlashContext) -> None:
     pass
 
 
 @journal.child
 @lightbulb.add_checks(has_permissions(hikari.Permissions.VIEW_AUDIT_LOG))
-@lightbulb.option("user", "The user to retrieve the journal for.", type=hikari.User)
-@lightbulb.command("get", "Retrieve the journal for the specified user.", pass_options=True)
+@lightbulb.option("user", "Пользователь для которого требуется получить журнал", type=hikari.User)
+@lightbulb.command("get", "Получить журнал для указанного пользователя", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def journal_get(ctx: SnedSlashContext, user: hikari.User) -> None:
+async def journal_get(ctx: ChenSlashContext, user: hikari.User) -> None:
 
     assert ctx.guild_id is not None
     notes = await ctx.app.mod.get_notes(user, ctx.guild_id)
@@ -228,8 +184,8 @@ async def journal_get(ctx: SnedSlashContext, user: hikari.User) -> None:
     else:
         await ctx.mod_respond(
             embed=hikari.Embed(
-                title="📒 Journal entries for this user:",
-                description=f"There are no journal entries for this user yet. Any moderation-actions will leave an entry here, or you can set one manually with `/journal add {ctx.options.user}`",
+                title="📒 Записи журнала для пользователя:",
+                description=f"Для этого пользователя нет записей в журнале. Добавить вручную можно командой `/journal add {ctx.options.user}`",
                 color=const.EMBED_BLUE,
             )
         )
@@ -237,19 +193,20 @@ async def journal_get(ctx: SnedSlashContext, user: hikari.User) -> None:
 
 @journal.child
 @lightbulb.add_checks(has_permissions(hikari.Permissions.VIEW_AUDIT_LOG))
-@lightbulb.option("note", "The journal note to add.")
-@lightbulb.option("user", "The user to add a journal entry for.", type=hikari.User)
-@lightbulb.command("add", "Add a new journal entry for the specified user.", pass_options=True)
+#@lightbulb.add_checks(lightbulb.has_roles(role1=957354746962903050))
+@lightbulb.option("note", "Заметка в журнале")
+@lightbulb.option("user", "Пользователь, для которого нужно добавить запись", type=hikari.User)
+@lightbulb.command("add", "Добавить новую запись в журнале для указанного пользователя", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def journal_add(ctx: SnedSlashContext, user: hikari.User, note: str) -> None:
+async def journal_add(ctx: ChenSlashContext, user: hikari.User, note: str) -> None:
 
     assert ctx.guild_id is not None
 
-    await ctx.app.mod.add_note(user, ctx.guild_id, f"💬 **Note by {ctx.author}:** {note}")
+    await ctx.app.mod.add_note(user, ctx.guild_id, f"💬 **От {ctx.author}:** {note}")
     await ctx.mod_respond(
         embed=hikari.Embed(
-            title="✅ Journal entry added!",
-            description=f"Added a new journal entry to user **{user}**. You can view this user's journal via the command `/journal get {ctx.options.user}`.",
+            title="✅ Добавлена запись в журнал",
+            description=f"Добавлена новая запись для **{user}**. Посмотреть журнал можно командой `/journal get {ctx.options.user}`.",
             color=const.EMBED_GREEN,
         )
     )
@@ -257,13 +214,13 @@ async def journal_add(ctx: SnedSlashContext, user: hikari.User, note: str) -> No
 
 @mod.command
 @lightbulb.add_checks(is_invoker_above_target, has_permissions(hikari.Permissions.VIEW_AUDIT_LOG))
-@lightbulb.option("reason", "The reason for this warn", required=False)
-@lightbulb.option("user", "The user to be warned.", type=hikari.Member)
+@lightbulb.option("reason", "Причина предупреждения", required=False)
+@lightbulb.option("user", "Пользователь", type=hikari.Member)
 @lightbulb.command(
-    "warn", "Warn a user. This gets added to their journal and their warn counter is incremented.", pass_options=True
+    "warn", "Предупреждение пользователю. Заносится в журнал", pass_options=True
 )
 @lightbulb.implements(lightbulb.SlashCommand)
-async def warn_cmd(ctx: SnedSlashContext, user: hikari.Member, reason: t.Optional[str] = None) -> None:
+async def warn_cmd(ctx: ChenSlashContext, user: hikari.Member, reason: t.Optional[str] = None) -> None:
     helpers.is_member(user)
     assert ctx.member is not None
     embed = await ctx.app.mod.warn(user, ctx.member, reason=reason)
@@ -271,32 +228,32 @@ async def warn_cmd(ctx: SnedSlashContext, user: hikari.Member, reason: t.Optiona
         embed=embed,
         components=miru.View().add_item(
             miru.Button(
-                label="View Journal", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
+                label="Просмотреть журнал", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
             )
         ),
     )
 
 
 @mod.command
-@lightbulb.command("warns", "Manage warnings.")
+@lightbulb.command("warns", "Управление предупреждениями")
 @lightbulb.implements(lightbulb.SlashCommandGroup)
-async def warns(ctx: SnedSlashContext) -> None:
+async def warns(ctx: ChenSlashContext) -> None:
     pass
 
 
 @warns.child
-@lightbulb.option("user", "The user to show the warning count for.", type=hikari.Member)
-@lightbulb.command("list", "List the current warning count for a user.", pass_options=True)
+@lightbulb.option("user", "Пользователь", type=hikari.Member)
+@lightbulb.command("list", "Список предупреждений пользователя", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def warns_list(ctx: SnedSlashContext, user: hikari.Member) -> None:
+async def warns_list(ctx: ChenSlashContext, user: hikari.Member) -> None:
     helpers.is_member(user)
     assert ctx.guild_id is not None
 
     db_user = await DatabaseUser.fetch(user.id, ctx.guild_id)
     warns = db_user.warns
     embed = hikari.Embed(
-        title=f"{user}'s warnings",
-        description=f"**Warnings:** `{warns}`",
+        title=f"{user}",
+        description=f"**Предупреждений:** `{warns}`",
         color=const.WARN_COLOR,
     )
     embed.set_thumbnail(user.display_avatar_url)
@@ -305,11 +262,11 @@ async def warns_list(ctx: SnedSlashContext, user: hikari.Member) -> None:
 
 @warns.child
 @lightbulb.add_checks(is_invoker_above_target, has_permissions(hikari.Permissions.VIEW_AUDIT_LOG))
-@lightbulb.option("reason", "The reason for clearing this user's warns.", required=False)
-@lightbulb.option("user", "The user to clear warnings for.", type=hikari.Member)
-@lightbulb.command("clear", "Clear warnings for the specified user.", pass_options=True)
+@lightbulb.option("reason", "Причина очистки предупреждений", required=False)
+@lightbulb.option("user", "Пользователь", type=hikari.Member)
+@lightbulb.command("clear", "Очистить ВСЕ предупреждения пользователя", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def warns_clear(ctx: SnedSlashContext, user: hikari.Member, reason: t.Optional[str] = None) -> None:
+async def warns_clear(ctx: ChenSlashContext, user: hikari.Member, reason: t.Optional[str] = None) -> None:
     helpers.is_member(user)
 
     assert ctx.guild_id is not None and ctx.member is not None
@@ -318,7 +275,7 @@ async def warns_clear(ctx: SnedSlashContext, user: hikari.Member, reason: t.Opti
         embed=embed,
         components=miru.View().add_item(
             miru.Button(
-                label="View Journal", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
+                label="Просмотреть журнал", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
             )
         ),
     )
@@ -326,11 +283,11 @@ async def warns_clear(ctx: SnedSlashContext, user: hikari.Member, reason: t.Opti
 
 @warns.child
 @lightbulb.add_checks(is_invoker_above_target, has_permissions(hikari.Permissions.VIEW_AUDIT_LOG))
-@lightbulb.option("reason", "The reason for clearing this user's warns.", required=False)
-@lightbulb.option("user", "The user to show the warning count for.", type=hikari.Member)
-@lightbulb.command("remove", "Remove a single warning from the specified user.", pass_options=True)
+@lightbulb.option("reason", "Причина удаления предупреждения пользователя", required=False)
+@lightbulb.option("user", "Пользователь", type=hikari.Member)
+@lightbulb.command("remove", "Удалить одно предупреждение пользователя", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def warns_remove(ctx: SnedSlashContext, user: hikari.Member, reason: t.Optional[str] = None) -> None:
+async def warns_remove(ctx: ChenSlashContext, user: hikari.Member, reason: t.Optional[str] = None) -> None:
     helpers.is_member(user)
 
     assert ctx.guild_id is not None and ctx.member is not None
@@ -340,7 +297,7 @@ async def warns_remove(ctx: SnedSlashContext, user: hikari.Member, reason: t.Opt
         embed=embed,
         components=miru.View().add_item(
             miru.Button(
-                label="View Journal", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
+                label="Просмотреть журнал", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
             )
         ),
     )
@@ -353,15 +310,15 @@ async def warns_remove(ctx: SnedSlashContext, user: hikari.Member, reason: t.Opt
     is_above_target,
     is_invoker_above_target,
 )
-@lightbulb.option("reason", "The reason for timing out this user.", required=False)
+@lightbulb.option("reason", "Причина тайм-аута", required=False)
 @lightbulb.option(
-    "duration", "The duration to time the user out for. Example: '10 minutes', '2022-03-01', 'tomorrow 20:00'"
+    "duration", "Продолжительность тайм-аута. Пример: '10 минут', '2022-03-01', 'завтра 20:00'"
 )
-@lightbulb.option("user", "The user to time out.", type=hikari.Member)
-@lightbulb.command("timeout", "Timeout a user, supports durations longer than 28 days.", pass_options=True)
+@lightbulb.option("user", "Пользователь", type=hikari.Member)
+@lightbulb.command("timeout", "Тайм-аут пользователя", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
 async def timeout_cmd(
-    ctx: SnedSlashContext, user: hikari.Member, duration: str, reason: t.Optional[str] = None
+    ctx: ChenSlashContext, user: hikari.Member, duration: str, reason: t.Optional[str] = None
 ) -> None:
     helpers.is_member(user)
     reason = helpers.format_reason(reason, max_length=1024)
@@ -370,8 +327,8 @@ async def timeout_cmd(
     if user.communication_disabled_until() is not None:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ User already timed out",
-                description="User is already timed out. Use `/timeouts remove` to remove it.",
+                title="❌ Уже в тайм-ауте",
+                description="Пользователь уже в тайм-ауте. Используйте `/timeouts remove` чтобы освободить",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -385,8 +342,8 @@ async def timeout_cmd(
     except ValueError:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid data entered",
-                description="Your entered timeformat is invalid.",
+                title="❌ Некорректная дата",
+                description="Введите корректную дату тайм-аута",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -401,16 +358,16 @@ async def timeout_cmd(
         embed=embed,
         components=miru.View().add_item(
             miru.Button(
-                label="View Journal", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
+                label="Просмотреть журнал", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
             )
         ),
     )
 
 
 @mod.command
-@lightbulb.command("timeouts", "Manage timeouts.")
+@lightbulb.command("timeouts", "Управление тайм-аутами")
 @lightbulb.implements(lightbulb.SlashCommandGroup)
-async def timeouts(ctx: SnedSlashContext) -> None:
+async def timeouts(ctx: ChenSlashContext) -> None:
     pass
 
 
@@ -421,11 +378,11 @@ async def timeouts(ctx: SnedSlashContext) -> None:
     is_above_target,
     is_invoker_above_target,
 )
-@lightbulb.option("reason", "The reason for timing out this user.", required=False)
-@lightbulb.option("user", "The user to time out.", type=hikari.Member)
-@lightbulb.command("remove", "Remove timeout from a user.", pass_options=True)
+@lightbulb.option("reason", "Причина удаления тайм-аута", required=False)
+@lightbulb.option("user", "Пользователь", type=hikari.Member)
+@lightbulb.command("remove", "Удалить тайм-аут пользователя", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def timeouts_remove_cmd(ctx: SnedSlashContext, user: hikari.Member, reason: t.Optional[str] = None) -> None:
+async def timeouts_remove_cmd(ctx: ChenSlashContext, user: hikari.Member, reason: t.Optional[str] = None) -> None:
     helpers.is_member(user)
     reason = helpers.format_reason(reason, max_length=1024)
 
@@ -434,8 +391,8 @@ async def timeouts_remove_cmd(ctx: SnedSlashContext, user: hikari.Member, reason
     if user.communication_disabled_until() is None:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ User not timed out",
-                description="This user is not timed out.",
+                title="❌ Пользователь не в тайм-ауте",
+                description="Этот пользователь и так может зайти на сервер",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -447,13 +404,13 @@ async def timeouts_remove_cmd(ctx: SnedSlashContext, user: hikari.Member, reason
 
     await ctx.mod_respond(
         embed=hikari.Embed(
-            title="🔉 " + "Timeout removed",
-            description=f"**{user}**'s timeout was removed.\n**Reason:** ```{reason}```",
+            title="🔉 " + "Таймаут удален",
+            description=f"Тайм-аут **{user}** снят.\n**Причина:** ```{reason}```",
             color=const.EMBED_GREEN,
         ),
         components=miru.View().add_item(
             miru.Button(
-                label="View Journal", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
+                label="Просмотреть журнал", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
             )
         ),
     )
@@ -468,24 +425,24 @@ async def timeouts_remove_cmd(ctx: SnedSlashContext, user: hikari.Member, reason
 )
 @lightbulb.option(
     "days_to_delete",
-    "The number of days of messages to delete. If not set, defaults to 0.",
+    "Количество дней сообщений для удаления. По-умолчанию 0",
     choices=["0", "1", "2", "3", "4", "5", "6", "7"],
     required=False,
     default=0,
 )
 @lightbulb.option(
     "duration",
-    "If specified, how long the ban should last. Example: '10 minutes', '2022-03-01', 'tomorrow 20:00'",
+    "Как долго/до когда должен длиться бан. Пример: '10 минут', '2022-03-01', 'завтра 20:00'",
     required=False,
 )
-@lightbulb.option("reason", "The reason why this ban was performed", required=False)
-@lightbulb.option("user", "The user to be banned", type=hikari.User)
+@lightbulb.option("reason", "Причина бана", required=False)
+@lightbulb.option("user", "Пользователь", type=hikari.User)
 @lightbulb.command(
-    "ban", "Bans a user from the server. Optionally specify a duration to make this a tempban.", pass_options=True
+    "ban", "Забанить пользователя на сервере. При желании можно выбрать на какое время", pass_options=True
 )
 @lightbulb.implements(lightbulb.SlashCommand)
 async def ban_cmd(
-    ctx: SnedSlashContext,
+    ctx: ChenSlashContext,
     user: hikari.User,
     reason: t.Optional[str] = None,
     duration: t.Optional[str] = None,
@@ -500,8 +457,8 @@ async def ban_cmd(
         except ValueError:
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Invalid data entered",
-                    description="Your entered timeformat is invalid.",
+                    title="❌ Некорректная дата",
+                    description="Введене невозможная дата",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -525,12 +482,12 @@ async def ban_cmd(
             miru.View()
             .add_item(
                 miru.Button(
-                    label="Unban", custom_id=f"UNBAN:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SUCCESS
+                    label="Разблокировать", custom_id=f"Разблокировать:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SUCCESS
                 )
             )
             .add_item(
                 miru.Button(
-                    label="View Journal",
+                    label="Просмотреть журнал",
                     custom_id=f"JOURNAL:{user.id}:{ctx.member.id}",
                     style=hikari.ButtonStyle.SECONDARY,
                 )
@@ -548,21 +505,21 @@ async def ban_cmd(
 )
 @lightbulb.option(
     "days_to_delete",
-    "The number of days of messages to delete. If not set, defaults to 0.",
+    "Количество дней сообщений для удаления. По-умолчанию 0",
     choices=["0", "1", "2", "3", "4", "5", "6", "7"],
     required=False,
     default=0,
 )
-@lightbulb.option("reason", "The reason why this softban was performed", required=False)
-@lightbulb.option("user", "The user to be softbanned", type=hikari.Member)
+@lightbulb.option("reason", "Причина софтбана", required=False)
+@lightbulb.option("user", "Пользователь", type=hikari.Member)
 @lightbulb.command(
     "softban",
-    "Softban a user from the server, removing their messages while immediately unbanning them.",
+    "Софтбан пользователя с удалением его сообщений и разбаном",
     pass_options=True,
 )
 @lightbulb.implements(lightbulb.SlashCommand)
 async def softban_cmd(
-    ctx: SnedSlashContext, user: hikari.Member, reason: t.Optional[str] = None, days_to_delete: t.Optional[str] = None
+    ctx: ChenSlashContext, user: hikari.Member, reason: t.Optional[str] = None, days_to_delete: t.Optional[str] = None
 ) -> None:
     helpers.is_member(user)
     assert ctx.member is not None
@@ -585,11 +542,11 @@ async def softban_cmd(
     is_above_target,
     is_invoker_above_target,
 )
-@lightbulb.option("reason", "The reason why this ban was performed", required=False)
-@lightbulb.option("user", "The user to be banned", type=hikari.User)
-@lightbulb.command("unban", "Unban a user who was previously banned.", pass_options=True)
+@lightbulb.option("reason", "Причина", required=False)
+@lightbulb.option("user", "Пользователь", type=hikari.User)
+@lightbulb.command("unban", "Разбан забаненного пользователя", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def unban_cmd(ctx: SnedSlashContext, user: hikari.User, reason: t.Optional[str] = None) -> None:
+async def unban_cmd(ctx: ChenSlashContext, user: hikari.User, reason: t.Optional[str] = None) -> None:
 
     assert ctx.member is not None
 
@@ -599,7 +556,7 @@ async def unban_cmd(ctx: SnedSlashContext, user: hikari.User, reason: t.Optional
         embed=embed,
         components=miru.View().add_item(
             miru.Button(
-                label="View Journal", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
+                label="Просмотреть журнал", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
             )
         ),
     )
@@ -612,11 +569,11 @@ async def unban_cmd(ctx: SnedSlashContext, user: hikari.User, reason: t.Optional
     is_above_target,
     is_invoker_above_target,
 )
-@lightbulb.option("reason", "The reason why this kick was performed.", required=False)
-@lightbulb.option("user", "The user to be banned", type=hikari.Member)
-@lightbulb.command("kick", "Kick a user from this server.", pass_options=True)
+@lightbulb.option("reason", "Причина", required=False)
+@lightbulb.option("user", "Пользователь", type=hikari.Member)
+@lightbulb.command("kick", "Кик пользователя с сервера", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def kick_cmd(ctx: SnedSlashContext, user: hikari.Member, reason: t.Optional[str] = None) -> None:
+async def kick_cmd(ctx: ChenSlashContext, user: hikari.Member, reason: t.Optional[str] = None) -> None:
 
     helpers.is_member(user)
     assert ctx.member is not None
@@ -627,7 +584,7 @@ async def kick_cmd(ctx: SnedSlashContext, user: hikari.Member, reason: t.Optiona
         embed=embed,
         components=miru.View().add_item(
             miru.Button(
-                label="View Journal", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
+                label="Просмотреть журнал", custom_id=f"JOURNAL:{user.id}:{ctx.member.id}", style=hikari.ButtonStyle.SECONDARY
             )
         ),
     )
@@ -639,16 +596,16 @@ async def kick_cmd(ctx: SnedSlashContext, user: hikari.Member, reason: t.Optiona
     has_permissions(hikari.Permissions.MANAGE_CHANNELS),
 )
 @lightbulb.option(
-    "interval", "The slowmode interval in seconds, use 0 to disable it.", type=int, min_value=0, max_value=21600
+    "interval", "Интервал медленного режима в секундах, 0 чтобы отключить", type=int, min_value=0, max_value=21600
 )
-@lightbulb.command("slowmode", "Set slowmode interval for this channel.", pass_options=True)
+@lightbulb.command("slowmode", "Установить слоу-мод режим в этом канале.", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def slowmode_mcd(ctx: SnedSlashContext, interval: int) -> None:
+async def slowmode_mcd(ctx: ChenSlashContext, interval: int) -> None:
     await ctx.app.rest.edit_channel(ctx.channel_id, rate_limit_per_user=interval)
     await ctx.mod_respond(
         embed=hikari.Embed(
-            title="✅ Slowmode updated",
-            description=f"{const.EMOJI_SLOWMODE} Slowmode is now set to 1 message per `{interval}` seconds.",
+            title="✅ Слоумод обновлен",
+            description=f"{const.EMOJI_SLOWMODE} Слоумод настроен на одно сообщение в `{interval}` секунд",
             color=const.EMBED_GREEN,
         )
     )
@@ -663,30 +620,30 @@ async def slowmode_mcd(ctx: SnedSlashContext, interval: int) -> None:
 )
 @lightbulb.option(
     "show",
-    "Only perform this as a dry-run and only show users that would have been banned. Defaults to False.",
+    "Фиктивный запуск. Показать пользователей, которые будут забанены",
     type=bool,
     default=False,
     required=False,
 )
-@lightbulb.option("reason", "Reason to ban all matched users with.", required=False)
-@lightbulb.option("regex", "A regular expression to match usernames against. Uses Python regex spec.", required=False)
+@lightbulb.option("reason", "Причина блокировки пользователей", required=False)
+@lightbulb.option("regex", "Регулярное выражение для сопоставления имен", required=False)
 @lightbulb.option(
-    "no-avatar", "Only match users without an avatar. Defaults to False.", type=bool, default=False, required=False
+    "no-avatar", "Только пользователей без аватара", type=bool, default=False, required=False
 )
 @lightbulb.option(
-    "no-roles", "Only match users without a role. Defaults to False.", type=bool, default=False, required=False
+    "no-roles", "Только пользователей без роли", type=bool, default=False, required=False
 )
 @lightbulb.option(
-    "created", "Only match users that signed up to Discord x minutes before.", type=int, min_value=1, required=False
+    "created", "Только пользователей, который зарегистрировались Х минут назад", type=int, min_value=1, required=False
 )
 @lightbulb.option(
-    "joined", "Only match users that joined this server x minutes before.", type=int, min_value=1, required=False
+    "joined", "Только пользователей которые присоединились к серверу X минут назад", type=int, min_value=1, required=False
 )
-@lightbulb.option("joined-before", "Only match users that joined before this user.", type=hikari.Member, required=False)
-@lightbulb.option("joined-after", "Only match users that joined after this user.", type=hikari.Member, required=False)
-@lightbulb.command("massban", "Ban a large number of users based on a set of criteria. Useful for handling raids")
+@lightbulb.option("joined-before", "Только пользователи, которые присоединились до данного пользователя", type=hikari.Member, required=False)
+@lightbulb.option("joined-after", "Только пользователи, которые присоединились после данного пользователя", type=hikari.Member, required=False)
+@lightbulb.command("massban", "Заблокировать сразу большое количество пользователей по параметрам")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def massban(ctx: SnedSlashContext) -> None:
+async def massban(ctx: ChenSlashContext) -> None:
 
     if ctx.options["joined-before"]:
         helpers.is_member(ctx.options["joined-before"])
@@ -717,8 +674,8 @@ async def massban(ctx: SnedSlashContext) -> None:
         except re.error as error:
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Invalid regex passed",
-                    description=f"Failed parsing regex: ```{str(error)}```",
+                    title="❌ Некорректное регулярное выражение",
+                    description=f"Error: ```{str(error)}```",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -779,18 +736,18 @@ async def massban(ctx: SnedSlashContext) -> None:
     if len(to_ban) == 0:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ No members match criteria",
-                description=f"No members found that match all criteria.",
+                title="❌ Пользователи не найдены",
+                description=f"Нет пользователей по заданым критериям",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
         )
         return
 
-    content = [f"Sned Massban Session: {guild.name}   |  Matched members against criteria: {len(to_ban)}\n{now}\n"]
+    content = [f"Массбан: {guild.name}   |  Сопоставленные пользователи: {len(to_ban)}\n{now}\n"]
 
     for member in to_ban:
-        content.append(f"{member} ({member.id})  |  Joined: {member.joined_at}  |  Created: {member.created_at}")
+        content.append(f"{member} ({member.id})  |  Присоединился: {member.joined_at}  |  Зарегистрирован: {member.created_at}")
 
     content = "\n".join(content)
     file = hikari.Bytes(content.encode("utf-8"), "members_to_ban.txt")
@@ -799,22 +756,22 @@ async def massban(ctx: SnedSlashContext) -> None:
         await ctx.mod_respond(attachment=file)
         return
 
-    reason = ctx.options.reason if ctx.options.reason is not None else "No reason provided."
+    reason = ctx.options.reason if ctx.options.reason is not None else "Причина не указана."
     helpers.format_reason(reason, ctx.member, max_length=512)
 
     embed = hikari.Embed(
-        title="⚠️ Confirm Massban",
-        description=f"You are about to ban **{len(to_ban)}** users. Are you sure you want to do this? Please review the attached list above for a full list of matched users. The user journals will not be updated.",
+        title="⚠️ Подвердите масс бан",
+        description=f"Вы собираетесь забанить **{len(to_ban)}** пользователей. Вы уверены, что хотите это сделать?",
         color=const.WARN_COLOR,
     )
     confirm_embed = hikari.Embed(
-        title="Starting Massban...",
-        description="This could take some time...",
+        title="Массбан запущен...",
+        description="Это может занять некоторое время...",
         color=const.WARN_COLOR,
     )
     cancel_embed = hikari.Embed(
-        title="Massban interrupted",
-        description="Massban session was terminated prematurely. No users were banned.",
+        title="Массбан прерван",
+        description="Ни один пользователь не был забанен",
         color=const.ERROR_COLOR,
     )
 
@@ -852,8 +809,8 @@ async def massban(ctx: SnedSlashContext) -> None:
 
     await ctx.mod_respond(
         embed=hikari.Embed(
-            title="✅ Massban finished",
-            description=f"Banned **{count}/{len(to_ban)}** users.",
+            title="✅ Массбан завершен",
+            description=f"Забанено пользователей: **{count}/{len(to_ban)}**",
             color=const.EMBED_GREEN,
         )
     )
@@ -862,11 +819,11 @@ async def massban(ctx: SnedSlashContext) -> None:
         await userlog.d.actions.unfreeze_logging(ctx.guild_id)
 
 
-def load(bot: SnedBot) -> None:
+def load(bot: ChenBot) -> None:
     bot.add_plugin(mod)
 
 
-def unload(bot: SnedBot) -> None:
+def unload(bot: ChenBot) -> None:
     bot.remove_plugin(mod)
 
 

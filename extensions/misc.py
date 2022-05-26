@@ -10,27 +10,27 @@ import psutil
 import pytz
 
 from etc import constants as const
-from models import SnedBot
+from models import ChenBot
 from models.checks import bot_has_permissions
 from models.checks import has_permissions
-from models.context import SnedMessageContext
-from models.context import SnedSlashContext
-from models.plugin import SnedPlugin
+from models.context import ChenMessageContext
+from models.context import ChenSlashContext
+from models.plugin import ChenPlugin
 from utils import helpers
 from utils.scheduler import ConversionMode
 
 logger = logging.getLogger(__name__)
 
-misc = SnedPlugin("Miscellaneous Commands")
+misc = ChenPlugin("Miscellaneous Commands")
 psutil.cpu_percent(interval=1)  # Call so subsequent calls for CPU % will not be blocking
 
 RGB_REGEX = re.compile(r"[0-9]{1,3} [0-9]{1,3} [0-9]{1,3}")
 
 
 @misc.command
-@lightbulb.command("ping", "Check the bot's latency.")
+@lightbulb.command("ping", "Проверить жив ли бот")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def ping(ctx: SnedSlashContext) -> None:
+async def ping(ctx: ChenSlashContext) -> None:
     await ctx.respond(
         embed=hikari.Embed(
             title="🏓 Pong!",
@@ -41,41 +41,41 @@ async def ping(ctx: SnedSlashContext) -> None:
 
 
 @misc.command
-@lightbulb.option("detach", "Send the embed in a detached manner from the slash command.", type=bool, required=False)
+@lightbulb.option("detach", "Отправить как отдельное сообщение", type=bool, required=False)
 @lightbulb.option(
     "color",
-    "The color of the embed. Expects three space-separated values for an RGB value.",
+    "Цвет. Ожидается 3 RGB значения через пробел",
     type=hikari.Color,
     required=False,
 )
-@lightbulb.option("author_url", "An URL to direct users to if the author is clicked.", required=False)
+@lightbulb.option("author_url", "URL на который идет переход по клику по автору", required=False)
 @lightbulb.option(
     "author_image_url",
-    "An URL pointing to an image to use for the author's avatar.",
+    "URL на аватар автора",
     required=False,
 )
-@lightbulb.option("author", "The author of the embed. Appears above the title.", required=False)
+@lightbulb.option("author", "Автор вставки. Появляется под заголовком", required=False)
 @lightbulb.option(
     "footer_image_url",
-    "An url pointing to an image to use for the embed footer.",
+    "Изображение в 'подвале' эмбеда",
     required=False,
 )
 @lightbulb.option(
     "image_url",
-    "An url pointing to an image to use for the embed image.",
+    "Изображение сбоку эмбеда",
     required=False,
 )
 @lightbulb.option(
     "thumbnail_url",
-    "An url pointing to an image to use for the thumbnail.",
+    "Изображение в виде миниатюры",
     required=False,
 )
-@lightbulb.option("footer", "The footer of the embed.", required=False)
-@lightbulb.option("description", "The description of the embed.", required=False)
-@lightbulb.option("title", "The title of the embed. Required.")
-@lightbulb.command("embed", "Generates a new embed with the parameters specified")
+@lightbulb.option("footer", "Подвал эмбеда", required=False)
+@lightbulb.option("description", "Описание эмбеда", required=False)
+@lightbulb.option("title", "Заголовок эмбеда. Обязателен!")
+@lightbulb.command("embed", "Сгенерировать новое embed-сообщение с параметрами")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def embed(ctx: SnedSlashContext) -> None:
+async def embed(ctx: ChenSlashContext) -> None:
     url_options = [
         ctx.options.image_url,
         ctx.options.thumbnail_url,
@@ -87,8 +87,8 @@ async def embed(ctx: SnedSlashContext) -> None:
         if option and not helpers.is_url(option):
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Invalid URL",
-                    description=f"Provided an invalid URL.",
+                    title="❌ Некорректный URL",
+                    description=f"Указан неверный URL.",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -98,8 +98,8 @@ async def embed(ctx: SnedSlashContext) -> None:
     if ctx.options.color is not None and not RGB_REGEX.fullmatch(ctx.options.color):
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid Color",
-                description=f"Colors must be of format `RRR GGG BBB`, three values seperated by spaces.",
+                title="❌ Некорректный цвет",
+                description=f"Цвет должен быть в формате `RRR GGG BBB`, три значения разделенные пробелами",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -131,8 +131,8 @@ async def embed(ctx: SnedSlashContext) -> None:
     ):
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Missing Permissions",
-                description=f"Sending embeds detached requires `Manage Messages` permissions!",
+                title="❌ Отсутствуют права доступа",
+                description=f"Необходимо иметь роль с правами на `Manage Messages`",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -146,7 +146,7 @@ async def embed(ctx: SnedSlashContext) -> None:
         if not isinstance(channel, (hikari.GuildTextChannel, hikari.GuildNewsChannel)):
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Cannot send in thread.",
+                    title="❌ Невозможно отправить в треде",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -165,7 +165,7 @@ async def embed(ctx: SnedSlashContext) -> None:
 
     await ctx.app.rest.create_message(ctx.channel_id, embed=embed)
     await ctx.respond(
-        embed=hikari.Embed(title="✅ Embed created!", color=const.EMBED_GREEN), flags=hikari.MessageFlag.EPHEMERAL
+        embed=hikari.Embed(title="✅ Embed создан!", color=const.EMBED_GREEN), flags=hikari.MessageFlag.EPHEMERAL
     )
 
 
@@ -177,7 +177,7 @@ async def embed_error(event: lightbulb.CommandErrorEvent) -> None:
         await event.context.respond(
             embed=hikari.Embed(
                 title="❌ Parsing error",
-                description=f"An error occurred parsing parameters.\n**Error:** ```{event.exception.original}```",
+                description=f"Ошибка парсинга параметров команды.\n**Error:** ```{event.exception.original}```",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -187,9 +187,9 @@ async def embed_error(event: lightbulb.CommandErrorEvent) -> None:
 
 
 @misc.command
-@lightbulb.command("about", "Displays information about the bot.")
+@lightbulb.command("about", "Вывести информацию о боте.")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def about(ctx: SnedSlashContext) -> None:
+async def about(ctx: ChenSlashContext) -> None:
     me = ctx.app.get_me()
     assert me is not None
     process = psutil.Process()
@@ -197,13 +197,10 @@ async def about(ctx: SnedSlashContext) -> None:
     await ctx.respond(
         embed=hikari.Embed(
             title=f"ℹ️ About {me.username}",
-            description=f"""**• Made by:** `Hyper#0001`
+            description=f"""**• Made by:** `fenrir#5455`
 **• Servers:** `{len(ctx.app.cache.get_guilds_view())}`
 **• Invite:** [Invite me!](https://discord.com/oauth2/authorize?client_id={me.id}&permissions=1494984682710&scope=bot%20applications.commands)
-**• Support:** [Click here!](https://discord.gg/KNKr8FPmJa)
-**• Terms of Service:** [Click here!](https://github.com/HyperGH/snedbot_v2/blob/main/tos.md)
-**• Privacy Policy:** [Click here!](https://github.com/HyperGH/snedbot_v2/blob/main/privacy.md)\n
-Blob emoji is licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)""",
+**• Support:** [Click here!](https://discord.gg/qxy6WE9cke)""",
             color=const.EMBED_BLUE,
         )
         .set_thumbnail(me.avatar_url)
@@ -226,16 +223,16 @@ Blob emoji is licensed under [Apache License 2.0](https://www.apache.org/license
 
 
 @misc.command
-@lightbulb.command("invite", "Invite the bot to your server!")
+@lightbulb.command("invite", "Пригласить бота на свой сервер!")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def invite(ctx: SnedSlashContext) -> None:
+async def invite(ctx: ChenSlashContext) -> None:
 
     if not ctx.app.dev_mode:
         invite_url = f"https://discord.com/oauth2/authorize?client_id={ctx.app.user_id}&permissions=1494984682710&scope=applications.commands%20bot"
         await ctx.respond(
             embed=hikari.Embed(
                 title="🌟 Yay!",
-                description=f"[Click here]({invite_url}) for an invite link!",
+                description=f"[Клинки]({invite_url}) чтобы пригласить бота на сервер!",
                 color=const.MISC_COLOR,
             )
         )
@@ -243,7 +240,7 @@ async def invite(ctx: SnedSlashContext) -> None:
         await ctx.respond(
             embed=hikari.Embed(
                 title="🌟 Oops!",
-                description=f"It looks like this bot is in developer mode, and not intended to be invited!",
+                description=f"Похоже бот не предназначен для приглашения!",
                 color=const.MISC_COLOR,
             )
         )
@@ -255,40 +252,33 @@ async def invite(ctx: SnedSlashContext) -> None:
     has_permissions(hikari.Permissions.MANAGE_NICKNAMES),
     bot_has_permissions(hikari.Permissions.CHANGE_NICKNAME),
 )
-@lightbulb.option("nickname", "The nickname to set the bot's nickname to. Type 'None' to reset it!")
-@lightbulb.command("setnick", "Set the bot's nickname!", pass_options=True)
+@lightbulb.option("nickname", "Сменить никнейм бота. None для сброса к стандартному значению")
+@lightbulb.command("setnick", "Установить никнейм бота!", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def setnick(ctx: SnedSlashContext, nickname: t.Optional[str] = None) -> None:
+async def setnick(ctx: ChenSlashContext, nickname: t.Optional[str] = None) -> None:
     assert ctx.guild_id is not None
 
     nickname = nickname[:32] if nickname and not nickname.casefold() == "none" else None
 
     await ctx.app.rest.edit_my_member(
-        ctx.guild_id, nickname=nickname, reason=f"Nickname changed via /setnick by {ctx.author}"
+        ctx.guild_id, nickname=nickname, reason=f"Никнейм изменен через /setnick от {ctx.author}"
     )
     await ctx.respond(
-        embed=hikari.Embed(title="✅ Nickname changed!", color=const.EMBED_GREEN), flags=hikari.MessageFlag.EPHEMERAL
+        embed=hikari.Embed(title="✅ Никнейм изменен!", color=const.EMBED_GREEN), flags=hikari.MessageFlag.EPHEMERAL
     )
 
 
 @misc.command
-@lightbulb.command("support", "Provides a link to the support Discord.")
+@lightbulb.command("support", "Задать вопросы относительно бота")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def support(ctx: SnedSlashContext) -> None:
-    await ctx.respond("https://discord.gg/KNKr8FPmJa", flags=hikari.MessageFlag.EPHEMERAL)
+async def support(ctx: ChenSlashContext) -> None:
+    await ctx.respond("https://discord.gg/qxy6WE9cke", flags=hikari.MessageFlag.EPHEMERAL)
 
 
 @misc.command
-@lightbulb.command("source", "Provides a link to the source-code of the bot.")
+@lightbulb.command("serverinfo", "Вывести информацию о текущем сервере")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def source(ctx: SnedSlashContext) -> None:
-    await ctx.respond("<https://github.com/HyperGH/snedbot>")
-
-
-@misc.command
-@lightbulb.command("serverinfo", "Provides detailed information about this server.")
-@lightbulb.implements(lightbulb.SlashCommand)
-async def serverinfo(ctx: SnedSlashContext) -> None:
+async def serverinfo(ctx: ChenSlashContext) -> None:
     assert ctx.guild_id is not None
     guild = ctx.app.cache.get_available_guild(ctx.guild_id)
     assert guild is not None
@@ -298,20 +288,20 @@ async def serverinfo(ctx: SnedSlashContext) -> None:
             title=f"ℹ️ Server Information",
             description=f"""**• Name:** `{guild.name}`
 **• ID:** `{guild.id}`
-**• Owner:** `{ctx.app.cache.get_member(guild.id, guild.owner_id)}` (`{guild.owner_id}`)
-**• Created at:** {helpers.format_dt(guild.created_at)} ({helpers.format_dt(guild.created_at, style="R")})
-**• Member count:** `{guild.member_count}`
-**• Roles:** `{len(guild.get_roles())}`
-**• Channels:** `{len(guild.get_channels())}`
-**• Nitro Boost level:** `{guild.premium_tier}`
-**• Nitro Boost count:** `{guild.premium_subscription_count or '*Not found*'}`
-**• Preferred locale:** `{guild.preferred_locale}`
-**• Community:** `{"Yes" if "COMMUNITY" in guild.features else "No"}`
-**• Partner:** `{"Yes" if "PARTNERED" in guild.features else "No"}`
-**• Verified:** `{"Yes" if "VERIFIED" in guild.features else "No"}`
-**• Discoverable:** `{"Yes" if "DISCOVERABLE" in guild.features else "No"}`
-**• Monetization enabled:** `{"Yes" if "MONETIZATION_ENABLED" in guild.features else "No"}`
-{f"**• Vanity URL:** {guild.vanity_url_code}" if guild.vanity_url_code else ""}
+**• Создатель:** `{ctx.app.cache.get_member(guild.id, guild.owner_id)}` (`{guild.owner_id}`)
+**• Создан:** {helpers.format_dt(guild.created_at)} ({helpers.format_dt(guild.created_at, style="R")})
+**• Пользователей:** `{guild.member_count}`
+**• Ролей:** `{len(guild.get_roles())}`
+**• Каналов:** `{len(guild.get_channels())}`
+**• Уровень Nitro:** `{guild.premium_tier}`
+**• Nitro Boost подписчики:** `{guild.premium_subscription_count or '*Not found*'}`
+**• Язык:** `{guild.preferred_locale}`
+**• Сообщество:** `{"Yes" if "COMMUNITY" in guild.features else "No"}`
+**• Discord партнер:** `{"Yes" if "PARTNERED" in guild.features else "No"}`
+**• Верификация:** `{"Yes" if "VERIFIED" in guild.features else "No"}`
+**• Публичный:** `{"Yes" if "DISCOVERABLE" in guild.features else "No"}`
+**• Монетизируемый:** `{"Yes" if "MONETIZATION_ENABLED" in guild.features else "No"}`
+{f"**• URL:** {guild.vanity_url_code}" if guild.vanity_url_code else ""}
 """,
             color=const.EMBED_BLUE,
         )
@@ -329,15 +319,15 @@ async def serverinfo(ctx: SnedSlashContext) -> None:
 )
 @lightbulb.option(
     "channel",
-    "The channel to send the message to, defaults to the current channel.",
+    "Канал для отправки сообщения. По-умолчанию текущий канал",
     required=False,
     type=hikari.TextableGuildChannel,
     channel_types=[hikari.ChannelType.GUILD_TEXT, hikari.ChannelType.GUILD_NEWS],
 )
-@lightbulb.option("text", "The text to echo.")
-@lightbulb.command("echo", "Repeat the provided text as the bot.", pass_options=True)
+@lightbulb.option("text", "Текст")
+@lightbulb.command("echo", "Повторить текст от имени бота.", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def echo(ctx: SnedSlashContext, text: str, channel: t.Optional[hikari.InteractionChannel] = None) -> None:
+async def echo(ctx: ChenSlashContext, text: str, channel: t.Optional[hikari.InteractionChannel] = None) -> None:
     # InteractionChannel has no overrides data
     send_to = (ctx.app.cache.get_guild_channel(channel.id) or ctx.get_channel()) if channel else ctx.get_channel()
 
@@ -345,7 +335,7 @@ async def echo(ctx: SnedSlashContext, text: str, channel: t.Optional[hikari.Inte
 
     if not send_to:
         await ctx.respond(
-            embed=hikari.Embed(title="❌ Cannot send message in threads yet!", color=const.ERROR_COLOR),
+            embed=hikari.Embed(title="❌ Невозможно отправить сообщение в треде!", color=const.ERROR_COLOR),
             flags=hikari.MessageFlag.EPHEMERAL,
         )
         return
@@ -362,7 +352,7 @@ async def echo(ctx: SnedSlashContext, text: str, channel: t.Optional[hikari.Inte
     await send_to.send(text[:2000])
 
     await ctx.respond(
-        embed=hikari.Embed(title="✅ Message sent!", color=const.EMBED_GREEN), flags=hikari.MessageFlag.EPHEMERAL
+        embed=hikari.Embed(title="✅ Сообщение отправлено!", color=const.EMBED_GREEN), flags=hikari.MessageFlag.EPHEMERAL
     )
 
 
@@ -373,10 +363,10 @@ async def echo(ctx: SnedSlashContext, text: str, channel: t.Optional[hikari.Inte
     ),
     has_permissions(hikari.Permissions.MANAGE_MESSAGES),
 )
-@lightbulb.option("message_link", "You can get this by right-clicking a message.", type=str)
-@lightbulb.command("edit", "Edit a message that was sent by the bot.", pass_options=True)
+@lightbulb.option("message_link", "Можно получить кликнов правой кнопкой мыши по сообщению", type=str)
+@lightbulb.command("edit", "Отредактировать сообщение отправленное ботом.", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def edit(ctx: SnedSlashContext, message_link: str) -> None:
+async def edit(ctx: ChenSlashContext, message_link: str) -> None:
 
     message = await helpers.parse_message_link(ctx, message_link)
     if not message:
@@ -415,20 +405,20 @@ async def edit(ctx: SnedSlashContext, message_link: str) -> None:
     if message.author.id != ctx.app.user_id:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Not Authored",
-                description="The bot did not author this message, thus it cannot edit it.",
+                title="❌ Не автор",
+                description="Бот не автор этого сообщения, поэтому не может его отредактировать.",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
         )
         return
 
-    modal = miru.Modal(f"Editing message in #{channel.name}")
+    modal = miru.Modal(f"Отредактировать сообщение в #{channel.name}")
     modal.add_item(
         miru.TextInput(
-            label="Content",
+            label="Контент",
             style=hikari.TextInputStyle.PARAGRAPH,
-            placeholder="Type the new content for this message...",
+            placeholder="Введите новый текст...",
             value=message.content,
             required=True,
             max_length=2000,
@@ -443,7 +433,7 @@ async def edit(ctx: SnedSlashContext, message_link: str) -> None:
     await message.edit(content=content)
 
     await modal.get_response_context().respond(
-        embed=hikari.Embed(title="✅ Message edited!", color=const.EMBED_GREEN), flags=hikari.MessageFlag.EPHEMERAL
+        embed=hikari.Embed(title="✅ Сообщение отредактировано!", color=const.EMBED_GREEN), flags=hikari.MessageFlag.EPHEMERAL
     )
 
 
@@ -453,16 +443,16 @@ async def edit(ctx: SnedSlashContext, message_link: str) -> None:
         hikari.Permissions.SEND_MESSAGES | hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.READ_MESSAGE_HISTORY
     )
 )
-@lightbulb.command("Raw Content", "Show raw content for this message.", pass_options=True)
+@lightbulb.command("Raw Content", "Показать RAW данного сообщение", pass_options=True)
 @lightbulb.implements(lightbulb.MessageCommand)
-async def raw(ctx: SnedMessageContext, target: hikari.Message) -> None:
+async def raw(ctx: ChenMessageContext, target: hikari.Message) -> None:
     if target.content:
         await ctx.respond(f"```{target.content[:1990]}```", flags=hikari.MessageFlag.EPHEMERAL)
     else:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Missing Content",
-                description="Oops! It looks like this message has no content to display!",
+                title="❌ Отсутствует контент",
+                description="Похоже это сообщение не имеет содержимого для отображения!",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -470,17 +460,17 @@ async def raw(ctx: SnedMessageContext, target: hikari.Message) -> None:
 
 
 @misc.command
-@lightbulb.option("timezone", "The timezone to set as your default. Example: 'Europe/Kiev'", autocomplete=True)
+@lightbulb.option("timezone", "Часовой пояс, который будет установлен по-умолчанию. Example: 'Europe/Kiev'", autocomplete=True)
 @lightbulb.command(
-    "timezone", "Sets your preferred timezone for other time-related commands to use.", pass_options=True
+    "timezone", "Устанавливает часовой пояс для других команд, связанных со временем.", pass_options=True
 )
 @lightbulb.implements(lightbulb.SlashCommand)
-async def set_timezone(ctx: SnedSlashContext, timezone: str) -> None:
+async def set_timezone(ctx: ChenSlashContext, timezone: str) -> None:
     if timezone.title() not in pytz.common_timezones:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid Timezone",
-                description="Oops! This does not look like a valid timezone! Specify your timezone as a valid `Continent/City` combination.",
+                title="❌ Некорректный часовой пояс",
+                description="Невалидный часовой пояс. Посмотреть Ваш часовой пояс можно [тут](https://24timezones.com/)",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -500,8 +490,8 @@ async def set_timezone(ctx: SnedSlashContext, timezone: str) -> None:
 
     await ctx.respond(
         embed=hikari.Embed(
-            title="✅ Timezone set!",
-            description=f"Your preferred timezone has been set to `{timezone.title()}`, all relevant commands will try to adapt to this setting! (E.g. `/reminder`)",
+            title="✅ Часовой пояс установлен!",
+            description=f"Часовой пояс изменен на `{timezone.title()}`",
             color=const.EMBED_GREEN,
         ),
         flags=hikari.MessageFlag.EPHEMERAL,
@@ -523,22 +513,22 @@ async def tz_opts(
     "style",
     "Timestamp style.",
     choices=[
-        "t - Short time",
-        "T - Long time",
-        "d - Short date",
-        "D - Long Date",
-        "f - Short Datetime",
-        "F - Long Datetime",
-        "R - Relative",
+        "t - Время кратко",
+        "T - Время целиком",
+        "d - Дата кратко",
+        "D - Дата целиком",
+        "f - Дата и время кратко",
+        "F - Дата и время целиком",
+        "R - Относительно",
     ],
     required=False,
 )
-@lightbulb.option("time", "The time to create the timestamp from. Examples: 'in 20 minutes', '2022-04-03', '21:43'")
+@lightbulb.option("time", "Создание временной метки. Пример: 'через 20 минут', '2022-04-03', '21:43'")
 @lightbulb.command(
-    "timestamp", "Create a Discord timestamp from human-readable time formats and dates.", pass_options=True
+    "timestamp", "Создание временной метки в Discord формате", pass_options=True
 )
 @lightbulb.implements(lightbulb.SlashCommand)
-async def timestamp_gen(ctx: SnedSlashContext, time: str, style: t.Optional[str] = None) -> None:
+async def timestamp_gen(ctx: ChenSlashContext, time: str, style: t.Optional[str] = None) -> None:
     try:
         converted_time = await ctx.app.scheduler.convert_time(
             time, conversion_mode=ConversionMode.ABSOLUTE, user=ctx.user
@@ -546,8 +536,8 @@ async def timestamp_gen(ctx: SnedSlashContext, time: str, style: t.Optional[str]
     except ValueError as error:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Error: Invalid data entered",
-                description=f"Your timeformat is invalid! \n**Error:** {error}",
+                title="❌ Error: введена некорректная дата",
+                description=f"**Error:** {error}",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -560,11 +550,11 @@ async def timestamp_gen(ctx: SnedSlashContext, time: str, style: t.Optional[str]
     )
 
 
-def load(bot: SnedBot) -> None:
+def load(bot: ChenBot) -> None:
     bot.add_plugin(misc)
 
 
-def unload(bot: SnedBot) -> None:
+def unload(bot: ChenBot) -> None:
     bot.remove_plugin(misc)
 
 

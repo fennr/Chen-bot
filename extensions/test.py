@@ -8,14 +8,14 @@ import miru
 from miru.ext import nav
 
 from etc import constants as const
-from models import SnedSlashContext
-from models.bot import SnedBot
-from models.plugin import SnedPlugin
+from models import ChenSlashContext
+from models.bot import ChenBot
+from models.plugin import ChenPlugin
 from utils import helpers
 
 logger = logging.getLogger(__name__)
 
-test = SnedPlugin("Test")
+test = ChenPlugin("Test")
 
 
 @test.listener(hikari.StartedEvent)
@@ -81,7 +81,7 @@ class BasicModal(miru.Modal):
 @test.command
 @lightbulb.command("mirupersistent", "Test miru persistent unbound")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def miru_persistent(ctx: SnedSlashContext) -> None:
+async def miru_persistent(ctx: ChenSlashContext) -> None:
     await ctx.respond("Beep Boop!", components=PersistentThing().build())
 
 
@@ -93,7 +93,7 @@ async def nonce_printer(event: hikari.GuildMessageCreateEvent) -> None:
 @test.command
 @lightbulb.command("mirutest", "Test miru views")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def viewtest(ctx: SnedSlashContext) -> None:
+async def viewtest(ctx: ChenSlashContext) -> None:
     view = BasicView()
     view.add_item(miru.Button(label="Settings!", url="discord://-/settings/advanced"))
     resp = await ctx.respond("foo", components=view.build())
@@ -103,7 +103,7 @@ async def viewtest(ctx: SnedSlashContext) -> None:
 @test.command
 @lightbulb.command("modaltest", "Test miru modals")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def modaltest(ctx: SnedSlashContext) -> None:
+async def modaltest(ctx: ChenSlashContext) -> None:
     modal = BasicModal()
     await modal.send(ctx.interaction)
 
@@ -111,7 +111,7 @@ async def modaltest(ctx: SnedSlashContext) -> None:
 @test.command
 @lightbulb.command("navtest", "Test miru nav")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def navtest(ctx: SnedSlashContext) -> None:
+async def navtest(ctx: ChenSlashContext) -> None:
 
     buttons = [nav.FirstButton(), nav.PrevButton(), nav.StopButton(), nav.NextButton(), nav.LastButton()]
 
@@ -124,7 +124,7 @@ async def navtest(ctx: SnedSlashContext) -> None:
 @lightbulb.option("text", "Text to analyze.")
 @lightbulb.command("perspectivetestmultiple", "aaa", auto_defer=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def testmultiple_cmd(ctx: SnedSlashContext) -> None:
+async def testmultiple_cmd(ctx: ChenSlashContext) -> None:
     text = ctx.options.text
     resps = []
     for i in range(1, 80):
@@ -149,7 +149,7 @@ async def testmultiple_cmd(ctx: SnedSlashContext) -> None:
 @lightbulb.option("text", "Text to analyze.")
 @lightbulb.command("perspectivetest", "aaa", auto_defer=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def test_cmd(ctx: SnedSlashContext) -> None:
+async def test_cmd(ctx: ChenSlashContext) -> None:
     text = ctx.options.text
     attribs = [
         kosu.Attribute(kosu.AttributeName.TOXICITY),
@@ -169,12 +169,12 @@ async def test_cmd(ctx: SnedSlashContext) -> None:
     await ctx.respond(content=content)
 
 
-def load(bot: SnedBot) -> None:
+def load(bot: ChenBot) -> None:
     # bot.add_plugin(test)
     pass
 
 
-def unload(bot: SnedBot) -> None:
+def unload(bot: ChenBot) -> None:
     # bot.remove_plugin(test)
     pass
 

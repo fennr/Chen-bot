@@ -8,33 +8,34 @@ import lightbulb
 import miru
 
 from etc import constants as const
+from etc.text import tags as txt
 from models import AuthorOnlyNavigator
-from models import SnedSlashContext
+from models import ChenSlashContext
 from models import Tag
-from models.bot import SnedBot
-from models.plugin import SnedPlugin
+from models.bot import ChenBot
+from models.plugin import ChenPlugin
 from utils import helpers
 
 logger = logging.getLogger(__name__)
 
-tags = SnedPlugin("Tag", include_datastore=True)
+tags = ChenPlugin("Tag", include_datastore=True)
 
 
 class TagEditorModal(miru.Modal):
     """Modal for creation and editing of tags."""
 
     def __init__(self, name: t.Optional[str] = None, content: t.Optional[str] = None) -> None:
-        title = "Create a tag"
+        title = "Создать метки"
         if content:
-            title = f"Editing tag {name}"
+            title = f"Редактирование метки {name}"
 
         super().__init__(title, timeout=600, autodefer=False)
 
         if not content:
             self.add_item(
                 miru.TextInput(
-                    label="Tag Name",
-                    placeholder="Enter a tag name...",
+                    label=txt.title.TagName,
+                    placeholder=txt.desc.TagName,
                     required=True,
                     min_length=3,
                     max_length=100,
@@ -43,9 +44,9 @@ class TagEditorModal(miru.Modal):
             )
         self.add_item(
             miru.TextInput(
-                label="Tag Content",
+                label=txt.title.TagContent,
                 style=hikari.TextInputStyle.PARAGRAPH,
-                placeholder="Enter tag content, supports markdown formatting...",
+                placeholder=txt.desc.TagContent,
                 required=True,
                 max_length=1500,
                 value=content,
@@ -61,18 +62,18 @@ class TagEditorModal(miru.Modal):
 
         for item, value in ctx.values.items():
             assert isinstance(item, miru.TextInput)
-            if item.label == "Tag Name":
+            if item.label == txt.title.TagName:
                 self.tag_name = value
-            elif item.label == "Tag Content":
+            elif item.label == txt.title.TagContent:
                 self.tag_content = value
 
 
 @tags.command
-@lightbulb.option("ephemeral", "If True, sends the tag in a way that only you can see it.", type=bool, default=False)
-@lightbulb.option("name", "The name of the tag you want to call.", autocomplete=True)
-@lightbulb.command("tag", "Call a tag and display it's contents.", pass_options=True)
+@lightbulb.option("ephemeral", "Если True, отправляет так, что только вы видите", type=bool, default=False)
+@lightbulb.option("name", "Имя метки, которую вы хотите вызвать", autocomplete=True)
+@lightbulb.command("tag", "Вызвать метку и отобразить содержимое", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def tag_cmd(ctx: SnedSlashContext, name: str, ephemeral: bool = False) -> None:
+async def tag_cmd(ctx: ChenSlashContext, name: str, ephemeral: bool = False) -> None:
     assert ctx.guild_id is not None
 
     tag = await Tag.fetch(name.casefold(), ctx.guild_id, add_use=True)
@@ -103,14 +104,14 @@ async def tag_name_ac(
 @tags.command
 @lightbulb.command("tags", "All commands for managing tags.")
 @lightbulb.implements(lightbulb.SlashCommandGroup)
-async def tag_group(ctx: SnedSlashContext) -> None:
+async def tag_group(ctx: ChenSlashContext) -> None:
     pass
 
 
 @tag_group.child
-@lightbulb.command("create", "Create a new tag. Opens a modal to specify the details.")
+@lightbulb.command("create", "Создать новую метку. Откроется модальное окно")
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def tag_create(ctx: SnedSlashContext) -> None:
+async def tag_create(ctx: ChenSlashContext) -> None:
 
     assert ctx.guild_id is not None and ctx.member is not None
 
@@ -126,8 +127,8 @@ async def tag_create(ctx: SnedSlashContext) -> None:
     if tag:
         await mctx.respond(
             embed=hikari.Embed(
-                title="❌ Tag exists",
-                description=f"This tag already exists. If the owner of this tag is no longer in the server, you can try doing `/tags claim {modal.tag_name.casefold()}`",
+                title="❌ Метка существует",
+                description=f"Эта метка уже существует. Если ее автора уже нет на сервере используй команду `/tags claim {modal.tag_name.casefold()}`",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -145,26 +146,26 @@ async def tag_create(ctx: SnedSlashContext) -> None:
 
     await mctx.respond(
         embed=hikari.Embed(
-            title="✅ Tag created!",
-            description=f"You can now call it with `/tag {tag.name}`",
+            title="✅ Метка создана",
+            description=f"Ее можно вызвать командой `/tag {tag.name}`",
             color=const.EMBED_GREEN,
         )
     )
 
 
 @tag_group.child
-@lightbulb.option("name", "The name of the tag to get information about.", autocomplete=True)
-@lightbulb.command("info", "Display information about the specified tag.", pass_options=True)
+@lightbulb.option("name", "Имя метки по которой нужно получить информацию", autocomplete=True)
+@lightbulb.command("info", "Отобразить информацию о метке", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def tag_info(ctx: SnedSlashContext, name: str) -> None:
+async def tag_info(ctx: ChenSlashContext, name: str) -> None:
     assert ctx.guild_id is not None
     tag = await Tag.fetch(name.casefold(), ctx.guild_id)
 
     if not tag:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Unknown tag",
-                description="Cannot find tag by that name.",
+                title="❌ Неизвестная метка",
+                description="Не получается найти метку по имени",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -178,8 +179,8 @@ async def tag_info(ctx: SnedSlashContext, name: str) -> None:
     aliases = ", ".join(tag.aliases) if tag.aliases else None
 
     embed = hikari.Embed(
-        title=f"💬 Tag Info: {tag.name}",
-        description=f"**Aliases:** `{aliases}`\n**Tag owner:** `{owner}`\n**Tag creator:** `{creator}`\n**Uses:** `{tag.uses}`",
+        title=f"💬 Метка: {tag.name}",
+        description=f"**Псевдонимы:** `{aliases}`\n**Владелец:** `{owner}`\n**Создатель:** `{creator}`\n**Использований:** `{tag.uses}`",
         color=const.EMBED_BLUE,
     )
     if isinstance(owner, hikari.Member):
@@ -198,19 +199,19 @@ async def tag_info_name_ac(
 
 
 @tag_group.child
-@lightbulb.option("alias", "The alias to add to this tag.")
-@lightbulb.option("name", "The tag to add an alias for.", autocomplete=True)
-@lightbulb.command("alias", "Adds an alias to a tag you own.", pass_options=True)
+@lightbulb.option("alias", "Добавить псевдоним к метке")
+@lightbulb.option("name", "Метка к которой добавляется псевдоним", autocomplete=True)
+@lightbulb.command("alias", "Добавить псевдоним к вашей метке", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def tag_alias(ctx: SnedSlashContext, name: str, alias: str) -> None:
+async def tag_alias(ctx: ChenSlashContext, name: str, alias: str) -> None:
     assert ctx.guild_id is not None
 
     alias_tag = await Tag.fetch(alias.casefold(), ctx.guild_id)
     if alias_tag:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Alias taken",
-                description=f"A tag or alias already exists with a same name. Try picking a different alias.",
+                title="❌ Псевдоним занят",
+                description=f"Метка или псевдоним уже заняты, смените имя",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -228,8 +229,8 @@ async def tag_alias(ctx: SnedSlashContext, name: str, alias: str) -> None:
         else:
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Too many aliases",
-                    description=f"Tag `{tag.name}` can only have up to **5** aliases.",
+                    title="❌ Слишком много псевдонимов",
+                    description=f"Метка `{tag.name}` может иметь до **5** псевдонимов",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -240,8 +241,8 @@ async def tag_alias(ctx: SnedSlashContext, name: str, alias: str) -> None:
 
         await ctx.respond(
             embed=hikari.Embed(
-                title="✅ Alias created",
-                description=f"Alias created for tag `{tag.name}`!\nYou can now also call it with `/tag {alias.casefold()}`",
+                title="✅ Метка создана",
+                description=f"Псевдоним создан для метки`{tag.name}`!\nТеперь ее можно вызвать так же командой `/tag {alias.casefold()}`",
                 color=const.EMBED_GREEN,
             )
         )
@@ -249,8 +250,8 @@ async def tag_alias(ctx: SnedSlashContext, name: str, alias: str) -> None:
     else:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid tag",
-                description="You either do not own this tag or it does not exist.",
+                title="❌ Неверная метка",
+                description="Вы либо не являетесь владельцем метки, либо она не существует",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -268,11 +269,11 @@ async def tag_alias_name_ac(
 
 
 @tag_group.child
-@lightbulb.option("alias", "The name of the alias to remove.")
-@lightbulb.option("name", "The tag to remove the alias from.", autocomplete=True)
-@lightbulb.command("delalias", "Remove an alias from a tag you own.", pass_options=True)
+@lightbulb.option("alias", "Имя псевдонима для удаления")
+@lightbulb.option("name", "Метка из которой нужно удалить псевдоним", autocomplete=True)
+@lightbulb.command("delalias", "Удалить псевдоним из метки", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def tag_delalias(ctx: SnedSlashContext, name: str, alias: str) -> None:
+async def tag_delalias(ctx: ChenSlashContext, name: str, alias: str) -> None:
     assert ctx.guild_id is not None
 
     tag = await Tag.fetch(name.casefold(), ctx.guild_id)
@@ -284,8 +285,8 @@ async def tag_delalias(ctx: SnedSlashContext, name: str, alias: str) -> None:
         else:
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Unknown alias",
-                    description=f"Tag `{tag.name}` does not have an alias called `{alias.casefold()}`",
+                    title="❌ Неизвестный псевдоним",
+                    description=f"Метка `{tag.name}` не имеет псевдонима `{alias.casefold()}`",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -296,8 +297,8 @@ async def tag_delalias(ctx: SnedSlashContext, name: str, alias: str) -> None:
 
         await ctx.respond(
             embed=hikari.Embed(
-                title="✅ Alias removed",
-                description=f"Alias `{alias.casefold()}` for tag `{tag.name}` has been deleted.",
+                title="✅ Псевидоним удален",
+                description=f"Псевдоним `{alias.casefold()}` метки `{tag.name}` был удален",
                 color=const.EMBED_GREEN,
             )
         )
@@ -305,8 +306,8 @@ async def tag_delalias(ctx: SnedSlashContext, name: str, alias: str) -> None:
     else:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid tag",
-                description="You either do not own this tag or it does not exist.",
+                title="❌ Неверная метка",
+                description="Вы либо не являетесь владельцем метки, либо она не существует",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -324,15 +325,15 @@ async def tag_delalias_name_ac(
 
 
 @tag_group.child
-@lightbulb.option("receiver", "The user to receive the tag.", type=hikari.Member)
-@lightbulb.option("name", "The name of the tag to transfer.", autocomplete=True)
+@lightbulb.option("receiver", "Пользователь, который получит метку", type=hikari.Member)
+@lightbulb.option("name", "Имя метки", autocomplete=True)
 @lightbulb.command(
     "transfer",
-    "Transfer ownership of a tag to another user, letting them modify or delete it.",
+    "Передать право на метку другому пользователю",
     pass_options=True,
 )
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def tag_transfer(ctx: SnedSlashContext, name: str, receiver: hikari.Member) -> None:
+async def tag_transfer(ctx: ChenSlashContext, name: str, receiver: hikari.Member) -> None:
     helpers.is_member(receiver)
     assert ctx.guild_id is not None
 
@@ -345,8 +346,8 @@ async def tag_transfer(ctx: SnedSlashContext, name: str, receiver: hikari.Member
 
         await ctx.respond(
             embed=hikari.Embed(
-                title="✅ Tag transferred",
-                description=f"Tag `{tag.name}`'s ownership was successfully transferred to {receiver.mention}",
+                title="✅ Метка передана",
+                description=f"Метка `{tag.name}` успешно передана {receiver.mention}",
                 color=const.EMBED_GREEN,
             )
         )
@@ -354,8 +355,8 @@ async def tag_transfer(ctx: SnedSlashContext, name: str, receiver: hikari.Member
     else:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid tag",
-                description="You either do not own this tag or it does not exist.",
+                title="❌ Неверная метка",
+                description="Вы либо не являетесь владельцем метки, либо она не существует",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -373,14 +374,14 @@ async def tag_transfer_name_ac(
 
 
 @tag_group.child
-@lightbulb.option("name", "The name of the tag to claim.", autocomplete=True)
+@lightbulb.option("name", "Имя метки для присвоения", autocomplete=True)
 @lightbulb.command(
     "claim",
-    "Claim a tag that has been created by a user that has since left the server.",
+    "Получить права на метку, которая была создана пользователем покинувшим сервер",
     pass_options=True,
 )
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def tag_claim(ctx: SnedSlashContext, name: str) -> None:
+async def tag_claim(ctx: ChenSlashContext, name: str) -> None:
 
     assert ctx.guild_id is not None and ctx.member is not None
 
@@ -399,8 +400,8 @@ async def tag_claim(ctx: SnedSlashContext, name: str) -> None:
 
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="✅ Tag claimed",
-                    description=f"Tag `{tag.name}` now belongs to you.",
+                    title="✅ Метка переприсвоена",
+                    description=f"Метка `{tag.name}` теперь переназначена на тебя",
                     color=const.EMBED_GREEN,
                 )
             )
@@ -408,8 +409,8 @@ async def tag_claim(ctx: SnedSlashContext, name: str) -> None:
         else:
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Owner present",
-                    description="Tag owner is still in the server. You can only claim tags that have been abandoned.",
+                    title="❌ Присутствует владелец",
+                    description="Заявить права можно только на метки, создатели которых покинули сервер",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -419,8 +420,8 @@ async def tag_claim(ctx: SnedSlashContext, name: str) -> None:
     else:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Unknown tag",
-                description="Cannot find tag by that name.",
+                title="❌ Неизвестная метка",
+                description="Не получается найти метку по имени",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -438,10 +439,10 @@ async def tag_claim_name_ac(
 
 
 @tag_group.child
-@lightbulb.option("name", "The name of the tag to edit.", autocomplete=True)
-@lightbulb.command("edit", "Edit the content of a tag you own.", pass_options=True)
+@lightbulb.option("name", "Имя изменяемой метки", autocomplete=True)
+@lightbulb.command("edit", "Изменить содержимое пренадлежащей вам метки", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def tag_edit(ctx: SnedSlashContext, name: str) -> None:
+async def tag_edit(ctx: ChenSlashContext, name: str) -> None:
 
     assert ctx.member is not None and ctx.guild_id is not None
 
@@ -450,8 +451,8 @@ async def tag_edit(ctx: SnedSlashContext, name: str) -> None:
     if not tag or tag.owner_id != ctx.author.id:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid tag",
-                description="You either do not own this tag or it does not exist.",
+                title="❌ Неверная метка",
+                description="Вы либо не являетесь владельцем метки, либо она не существует",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -472,8 +473,8 @@ async def tag_edit(ctx: SnedSlashContext, name: str) -> None:
 
     await mctx.respond(
         embed=hikari.Embed(
-            title="✅ Tag edited",
-            description=f"Tag `{tag.name}` has been successfully edited.",
+            title="✅ Метка изменена",
+            description=f"Метка `{tag.name}` была успешно изменена",
             color=const.EMBED_GREEN,
         )
     )
@@ -489,10 +490,10 @@ async def tag_edit_name_ac(
 
 
 @tag_group.child
-@lightbulb.option("name", "The name of the tag to delete.", autocomplete=True)
-@lightbulb.command("delete", "Delete a tag you own.", pass_options=True)
+@lightbulb.option("name", "Имя метки для удаления", autocomplete=True)
+@lightbulb.command("delete", "Удалить метку", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def tag_delete(ctx: SnedSlashContext, name: str) -> None:
+async def tag_delete(ctx: ChenSlashContext, name: str) -> None:
 
     assert ctx.member is not None and ctx.guild_id is not None
 
@@ -507,8 +508,8 @@ async def tag_delete(ctx: SnedSlashContext, name: str) -> None:
 
         await ctx.respond(
             embed=hikari.Embed(
-                title="✅ Tag deleted",
-                description=f"Tag `{tag.name}` has been deleted.",
+                title="✅ Метка удалена",
+                description=f"Метка `{tag.name}` была успешно удалена",
                 color=const.EMBED_GREEN,
             )
         )
@@ -516,8 +517,8 @@ async def tag_delete(ctx: SnedSlashContext, name: str) -> None:
     else:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid tag",
-                description="You either do not own this tag or it does not exist.",
+                title="❌ Неверная метка",
+                description="Вы либо не являетесь владельцем метки, либо она не существует",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -535,22 +536,22 @@ async def tag_delete_name_ac(
 
 
 @tag_group.child
-@lightbulb.option("owner", "Only show tags that are owned by this user.", type=hikari.User, required=False)
-@lightbulb.command("list", "List all tags this server has.", pass_options=True)
+@lightbulb.option("owner", "Показать только метки определенного пользователя", type=hikari.User, required=False)
+@lightbulb.command("list", "Список всех меток на сервере", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def tag_list(ctx: SnedSlashContext, owner: t.Optional[hikari.User] = None) -> None:
+async def tag_list(ctx: ChenSlashContext, owner: t.Optional[hikari.User] = None) -> None:
     assert ctx.member is not None and ctx.guild_id is not None
 
     tags = await Tag.fetch_all(ctx.guild_id, owner)
 
     if tags:
-        tags_fmt = [f"**#{i+1}** - `{tag.uses}` uses: `{tag.name}`" for i, tag in enumerate(tags)]
+        tags_fmt = [f"**#{i+1}** - `{tag.uses}` использует: `{tag.name}`" for i, tag in enumerate(tags)]
         # Only show 8 tags per page
         tags_fmt = [tags_fmt[i * 8 : (i + 1) * 8] for i in range((len(tags_fmt) + 8 - 1) // 8)]
 
         embeds = [
             hikari.Embed(
-                title=f"💬 Available tags{f' owned by {owner.username}' if owner else ''}:",
+                title=f"💬 Доступные метки{f' пользователя {owner.username}' if owner else ''}:",
                 description="\n".join(contents),
                 color=const.EMBED_BLUE,
             )
@@ -563,18 +564,18 @@ async def tag_list(ctx: SnedSlashContext, owner: t.Optional[hikari.User] = None)
     else:
         await ctx.respond(
             embed=hikari.Embed(
-                title=f"💬 Available tags{f' owned by {owner.username}' if owner else ''}:",
-                description="No tags found! You can create one via `/tags create`",
+                title=f"💬 Доступные метки{f' пользователя {owner.username}' if owner else ''}:",
+                description="Метки не найдены. Вы можете их создать командой`/tags create`",
                 color=const.EMBED_BLUE,
             )
         )
 
 
 @tag_group.child
-@lightbulb.option("query", "The tag name or alias to search for.")
-@lightbulb.command("search", "Search for a tag name or alias.", pass_options=True)
+@lightbulb.option("query", "Имя метки или псевдонима")
+@lightbulb.command("search", "Поиск меток по имени или псевдониму", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def tag_search(ctx: SnedSlashContext, query: str) -> None:
+async def tag_search(ctx: ChenSlashContext, query: str) -> None:
 
     assert ctx.member is not None and ctx.guild_id is not None
 
@@ -590,14 +591,14 @@ async def tag_search(ctx: SnedSlashContext, query: str) -> None:
 
         if response:
             await ctx.respond(
-                embed=hikari.Embed(title=f"🔎 Search results for '{query}':", description="\n".join(response[:10]))
+                embed=hikari.Embed(title=f"🔎 Результат поиска для '{query}':", description="\n".join(response[:10]))
             )
 
         else:
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="Not found",
-                    description="Unable to find tags with that name.",
+                    title="Не найдены",
+                    description="Не удалось найти метки с таким именем",
                     color=const.WARN_COLOR,
                 )
             )
@@ -605,18 +606,18 @@ async def tag_search(ctx: SnedSlashContext, query: str) -> None:
     else:
         await ctx.respond(
             embed=hikari.Embed(
-                title="🔎 Search failed",
-                description="There are no tags on this server yet! You can create one via `/tags create`",
+                title="🔎 Ошибка поиска",
+                description="На этом сервере пока нет меток. Их можно создать командой `/tags create`",
                 color=const.WARN_COLOR,
             )
         )
 
 
-def load(bot: SnedBot) -> None:
+def load(bot: ChenBot) -> None:
     bot.add_plugin(tags)
 
 
-def unload(bot: SnedBot) -> None:
+def unload(bot: ChenBot) -> None:
     bot.remove_plugin(tags)
 
 

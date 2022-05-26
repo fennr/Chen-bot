@@ -6,76 +6,75 @@ import hikari
 import lightbulb
 
 import etc.constants as const
-from models.context import SnedSlashContext
-from models.plugin import SnedPlugin
+from models.context import ChenSlashContext
+from models.plugin import ChenPlugin
 
 if t.TYPE_CHECKING:
-    from models import SnedBot
+    from models import ChenBot
 
 
-help = SnedPlugin("Help")
+help = ChenPlugin("Help")
 
 
 help_embeds = {
     # Default no topic help
     None: hikari.Embed(
         title="ℹ️ __Help__",
-        description="""**Welcome to Sned Help!**
+        description="""**Привет, это помощь по использованию бота Chen!**
             
-To get started with using the bot, simply press `/` to reveal all commands! If you would like to get help about a specific topic, use `/help topic_name`.
+Чтобы начать использовать бота, набери `/` чтобы увидеть все доступные команды! Чтобы посмотреть справку по нескольким особенностям можно рабрать `/help topic_name`.
 
-If you need assistance, found a bug, or just want to hang out, please join our [support server](https://discord.gg/KNKr8FPmJa)!
+Если нужна помощь или вы обнаружили баг, можно написать на [Samuro_dev сервер](https://discord.gg/rt458hps)!
 
-Thank you for using Sned!""",
+Thank you for using Chen!""",
         color=const.EMBED_BLUE,
     ),
     # Default no topic help for people with manage guild perms
     "admin_home": hikari.Embed(
         title="ℹ️ __Help__",
-        description="""**Welcome to Sned Help!**
+        description="""**Это хелп по использованию команд бота Chen**
             
-To get started with using the bot, simply press `/` to reveal all commands! If you would like to get help about a specific topic, use `/help topic_name`.
+Чтобы начать использовать бота набери `/` чтобы увидеть все доступные команды! Несколько дополнительных настроек можно изучить командами `/help topic_name`.
 
-You may begin configuring the bot via the `/settings` command, which shows all relevant settings & lets you modify them.
+Для настройки бота на сервере необходимо набрать `/settings`.
 
-If you need assistance, found a bug, or just want to hang out, please join our [support server](https://discord.gg/KNKr8FPmJa)!
+Проверить, что бот корректно настроен можно командой `/troubleshoot`.
 
-Thank you for using Sned!""",
+Если нужна помощь или вы обнаружили баг, можно написать на [Samuro_dev сервер](https://discord.gg/rt458hps)!
+
+""",
         color=const.EMBED_BLUE,
     ),
     "time-formatting": hikari.Embed(
-        title="ℹ️ __Help: Time Formatting__",
-        description="""This help article aims to familiarize you with the various ways you can input time into bot commands.
+        title="ℹ️ __Help: Формат времени__",
+        description="""Бот поддерживает ввод времени в различных форматах:
 
-**Dates:**
+**Даты:**
 `2022-03-04 23:43`
 `04/03/2022 23:43`
 `2022/04/03 11:43PM`
 `...`
 
-**Relative:**
-`in 10 minutes`
-`tomorrow at 5AM`
-`next week`
-`2 days ago`
+**Относительный ввод:**
+`через 10 минут`
+`через 2 дня`
 `...`
 
-**ℹ️ Note:**
-Absolute time-conversion may require the bot to be aware of your timezone. You can set your timezone via the `/timezone` command, if you wish.
+**ℹ️ Заметка:**
+Абсолютное время требует, чтобы бот знал ваш часовой пояс. Его можно установить командой `/timezone`.
 """,
         color=const.EMBED_BLUE,
     ),
     "permissions": hikari.Embed(
-        title="ℹ️ __Help: Permissions__",
-        description="""Command permissions for the bot are managed directly through Discord. To access them, navigate to:
-```Server Settings > Integrations > Sned```
-Here you may configure permissions per-command or on a global basis, as you see fit.""",
+        title="ℹ️ __Help: Разрешения__",
+        description="""Разрешения редактируются через настройки сервера:
+```Настройки сервера > Интеграция > Chen```
+Здесь можно настроить разрешения для каждой команды, как вы считаете нужным или оставить по-умолчанию""",
         color=const.EMBED_BLUE,
     ).set_image("https://cdn.discordapp.com/attachments/836300326172229672/949047433038544896/unknown.png"),
     "configuration": hikari.Embed(
-        title="ℹ️ ___Help: Configuration__",
-        description="""To configure the bot, use the `/settings` command. This will open up an interactive menu for you to change the different properties of the bot, enable/disable features, or tailor them to your liking.
-If you need any assistance in configuring the bot, do not hesitate to join our [support server](https://discord.gg/KNKr8FPmJa)!""",
+        title="ℹ️ ___Help: Конфигурация__",
+        description="""Для настройки бота используйте команду `/settings`. Это откроет интерактивное меню, в котором можно изменить различные настройки бота под ваш сервер.""",
         color=const.EMBED_BLUE,
     ),
 }
@@ -84,13 +83,13 @@ If you need any assistance in configuring the bot, do not hesitate to join our [
 @help.command
 @lightbulb.option(
     "topic",
-    "A specific topic to get help about.",
+    "Особенности настройки бота",
     required=False,
     choices=["time-formatting", "configuration", "permissions"],
 )
-@lightbulb.command("help", "Get help regarding various subjects of the bot's functionality.", pass_options=True)
+@lightbulb.command("help", "Получить помощь по различным функциям бота", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def help_cmd(ctx: SnedSlashContext, topic: t.Optional[str] = None) -> None:
+async def help_cmd(ctx: ChenSlashContext, topic: t.Optional[str] = None) -> None:
     if ctx.member:
         topic = (
             topic or "admin_home"
@@ -100,11 +99,11 @@ async def help_cmd(ctx: SnedSlashContext, topic: t.Optional[str] = None) -> None
     await ctx.respond(embed=help_embeds[topic])
 
 
-def load(bot: SnedBot) -> None:
+def load(bot: ChenBot) -> None:
     bot.add_plugin(help)
 
 
-def unload(bot: SnedBot) -> None:
+def unload(bot: ChenBot) -> None:
     bot.remove_plugin(help)
 
 

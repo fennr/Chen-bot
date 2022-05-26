@@ -8,10 +8,11 @@ import miru
 
 import models
 from etc import constants as const
-from models import SnedBot
-from models import SnedSlashContext
+from etc.text import role_buttons as txt
+from models import ChenBot
+from models import ChenSlashContext
 from models.checks import has_permissions
-from models.plugin import SnedPlugin
+from models.plugin import ChenPlugin
 from models.rolebutton import RoleButton
 from models.rolebutton import RoleButtonMode
 from utils import helpers
@@ -20,7 +21,7 @@ from utils.ratelimiter import RateLimiter
 
 logger = logging.getLogger(__name__)
 
-role_buttons = SnedPlugin("Rolebuttons")
+role_buttons = ChenPlugin("Rolebuttons")
 
 BUTTON_STYLES = {
     "Blurple": hikari.ButtonStyle.PRIMARY,
@@ -48,11 +49,11 @@ class RoleButtonConfirmModal(miru.Modal):
     """A modal to handle editing of confirmation prompts for rolebuttons."""
 
     def __init__(self, role_button: RoleButton, type: RoleButtonConfirmType) -> None:
-        super().__init__(f"Add rolebutton confirmation for button #{role_button.id}", timeout=600, autodefer=False)
+        super().__init__(f"Сообщение для кнопки #{role_button.id}", timeout=600, autodefer=False)
         self.add_item(
             miru.TextInput(
                 label="Title",
-                placeholder="Enter prompt title, leave empty to reset...",
+                placeholder="Заголовок кнопки, оставить пустым для сброса...",
                 min_length=1,
                 max_length=100,
                 value=role_button.add_title if type == RoleButtonConfirmType.ADD else role_button.remove_title,
@@ -61,7 +62,7 @@ class RoleButtonConfirmModal(miru.Modal):
         self.add_item(
             miru.TextInput(
                 label="Description",
-                placeholder="Enter prompt description, leave empty to reset...",
+                placeholder="Описание кнопки, оставить пустым для сброса...",
                 min_length=1,
                 max_length=3000,
                 style=hikari.TextInputStyle.PARAGRAPH,
@@ -87,15 +88,15 @@ class RoleButtonConfirmModal(miru.Modal):
 
         await context.respond(
             embed=hikari.Embed(
-                title=f"✅ Rolebutton confirmation prompt updated!",
-                description=f"Confirmation prompt updated for button **#{self.role_button.id}**.",
+                title=f"✅ Описание кнопки обновлено!",
+                description=f"Описание обновлено для кнопки ID: **#{self.role_button.id}**.",
                 color=0x77B255,
             )
         )
 
 
 @role_buttons.listener(miru.ComponentInteractionCreateEvent, bind=True)
-async def rolebutton_listener(plugin: SnedPlugin, event: miru.ComponentInteractionCreateEvent) -> None:
+async def rolebutton_listener(plugin: ChenPlugin, event: miru.ComponentInteractionCreateEvent) -> None:
     """Statelessly listen for rolebutton interactions"""
 
     if not event.interaction.custom_id.startswith("RB:"):
@@ -112,8 +113,8 @@ async def rolebutton_listener(plugin: SnedPlugin, event: miru.ComponentInteracti
     if not role:
         await event.context.respond(
             embed=hikari.Embed(
-                title="❌ Orphaned",
-                description="The role this button was pointing to was deleted! Contact an administrator!",
+                title="❌ Связь нарушена",
+                description="Роль, на которую указывала эта кнопка была удалена. Сообщите об этом администратору сообщества!",
                 color=0xFF0000,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -126,8 +127,8 @@ async def rolebutton_listener(plugin: SnedPlugin, event: miru.ComponentInteracti
     if not helpers.includes_permissions(lightbulb.utils.permissions_for(me), hikari.Permissions.MANAGE_ROLES):
         await event.context.respond(
             embed=hikari.Embed(
-                title="❌ Missing Permissions",
-                description="Bot does not have `Manage Roles` permissions! Contact an administrator!",
+                title="❌ Недостаточно прав",
+                description="Бот должен иметь права `Manage Roles`. Сообщите об этом администрации сообщества!",
                 color=0xFF0000,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -138,8 +139,8 @@ async def rolebutton_listener(plugin: SnedPlugin, event: miru.ComponentInteracti
     if role_button_ratelimiter.is_rate_limited(event.context):
         await event.context.respond(
             embed=hikari.Embed(
-                title="❌ Slow Down!",
-                description="You are clicking too fast!",
+                title="❌ Тише!",
+                description="Ты кликаешь слишком быстро!",
                 color=0xFF0000,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -155,8 +156,8 @@ async def rolebutton_listener(plugin: SnedPlugin, event: miru.ComponentInteracti
         if not role_button:  # This should theoretically never happen, but I do not trust myself
             await event.context.respond(
                 embed=hikari.Embed(
-                    title="❌ Missing Data",
-                    description="The rolebutton you clicked on is missing data, or was improperly deleted! Contact an administrator!",
+                    title="❌ Потеряна информация",
+                    description="В кнопке отсутствует информация или она была неправильно удалена! Сообщите об этом администратору!",
                     color=0xFF0000,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -166,44 +167,44 @@ async def rolebutton_listener(plugin: SnedPlugin, event: miru.ComponentInteracti
         if role.id in event.context.member.role_ids:
 
             if role_button.mode in [RoleButtonMode.TOGGLE, RoleButtonMode.REMOVE_ONLY]:
-                await event.context.member.remove_role(role, reason=f"Removed by role-button (ID: {entry_id})")
+                await event.context.member.remove_role(role, reason=f"Удалена по кнопке (ID: {entry_id})")
                 embed = hikari.Embed(
-                    title=f"✅ {role_button.remove_title or 'Role removed'}",
-                    description=f"{role_button.remove_description or f'Removed role: {role.mention}'}",
+                    title=f"✅ {role_button.remove_title or 'Роль удалена'}",
+                    description=f"{role_button.remove_description or f'Удаленная роль: {role.mention}'}",
                     color=0x77B255,
                 )
             else:
                 embed = hikari.Embed(
-                    title="❌ Role already added",
-                    description=f"You already have the role {role.mention}!",
+                    title="❌ Роль уже добавлена",
+                    description=f"У тебя уже есть роль {role.mention}!",
                     color=0xFF0000,
-                ).set_footer("This button is set to only add roles, not remove them.")
+                ).set_footer("Эта кнопка предназначена только для добавления ролей, но не для их удаления")
 
         else:
 
             if role_button.mode in [RoleButtonMode.TOGGLE, RoleButtonMode.ADD_ONLY]:
-                await event.context.member.add_role(role, reason=f"Granted by role-button (ID: {entry_id})")
+                await event.context.member.add_role(role, reason=f"Добавлена по кнопке (ID: {entry_id})")
                 embed = hikari.Embed(
-                    title=f"✅ {role_button.add_title or 'Role added'}",
-                    description=f"{role_button.add_description or f'Added role: {role.mention}'}",
+                    title=f"✅ {role_button.add_title or 'Роль добавлена'}",
+                    description=f"{role_button.add_description or f'Добавленная роль: {role.mention}'}",
                     color=0x77B255,
                 )
                 if not role_button.add_description and role_button.mode == RoleButtonMode.TOGGLE:
-                    embed.set_footer("To remove the role, click the button again!")
+                    embed.set_footer("Для удаления роли снова кликните по кнопке")
             else:
                 embed = hikari.Embed(
-                    title="❌ Role already removed",
-                    description=f"You do not have the role {role.mention}!",
+                    title="❌ Роль уже удалена",
+                    description=f"У вас нет роли {role.mention}!",
                     color=0xFF0000,
-                ).set_footer("This button is set to only remove roles, not add them.")
+                ).set_footer("Эта кнопка предназначена только для удаления ролей, но не для добавления")
 
         await event.context.respond(embed=embed, flags=hikari.MessageFlag.EPHEMERAL)
 
     except (hikari.ForbiddenError, hikari.HTTPError):
         await event.context.respond(
             embed=hikari.Embed(
-                title="❌ Insufficient permissions",
-                description="Failed changing role due to an issue with permissions and/or role hierarchy! Please contact an administrator!",
+                title="❌ Недостаточно прав",
+                description="Не удалось изменить роль из-за проблем с иерархией ролей. Сообщите об этом администрации!",
                 color=0xFF0000,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -213,15 +214,15 @@ async def rolebutton_listener(plugin: SnedPlugin, event: miru.ComponentInteracti
 @role_buttons.command
 @lightbulb.command("rolebutton", "Commands relating to rolebuttons.")
 @lightbulb.implements(lightbulb.SlashCommandGroup)
-async def rolebutton(ctx: SnedSlashContext) -> None:
+async def rolebutton(ctx: ChenSlashContext) -> None:
     pass
 
 
 @rolebutton.child
 @lightbulb.add_checks(has_permissions(hikari.Permissions.MANAGE_ROLES))
-@lightbulb.command("list", "List all registered rolebuttons on this server.")
+@lightbulb.command("list", "Список всех созданных кнопок ролей на этом сервере")
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def rolebutton_list(ctx: SnedSlashContext) -> None:
+async def rolebutton_list(ctx: ChenSlashContext) -> None:
 
     assert ctx.guild_id is not None
 
@@ -230,8 +231,8 @@ async def rolebutton_list(ctx: SnedSlashContext) -> None:
     if not buttons:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Error: No role-buttons",
-                description="There are no role-buttons for this server.",
+                title="❌ Error: Нет кнопок-ролей",
+                description="На сервере не создавались кнопки. Попробуйте команду '/rolebutton add'",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -251,7 +252,7 @@ async def rolebutton_list(ctx: SnedSlashContext) -> None:
 
     embeds = [
         hikari.Embed(
-            title="Rolebuttons on this server:",
+            title="Кнопки ролей на сервере:",
             description=page,
             color=const.EMBED_BLUE,
         )
@@ -266,13 +267,13 @@ async def rolebutton_list(ctx: SnedSlashContext) -> None:
 @lightbulb.add_checks(has_permissions(hikari.Permissions.MANAGE_ROLES))
 @lightbulb.option(
     "button_id",
-    "The ID of the rolebutton to delete. You can get this via /rolebutton list",
+    "ID кнопки, которую необходимо удалить. Посмотреть ID можно командой /rolebutton list",
     type=int,
     min_value=0,
 )
-@lightbulb.command("delete", "Delete a rolebutton.", pass_options=True)
+@lightbulb.command("delete", "Удалить кнопку роли", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def rolebutton_del(ctx: SnedSlashContext, button_id: int) -> None:
+async def rolebutton_del(ctx: ChenSlashContext, button_id: int) -> None:
     assert ctx.guild_id is not None
 
     button = await RoleButton.fetch(button_id)
@@ -280,8 +281,8 @@ async def rolebutton_del(ctx: SnedSlashContext, button_id: int) -> None:
     if not button:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Not found",
-                description="There is no rolebutton by that ID. Check your existing rolebuttons via `/rolebutton list`",
+                title="❌ Не найдена",
+                description="Нет кнопки с таким ID. Посмотреть ID можно командой `/rolebutton list`",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -293,8 +294,8 @@ async def rolebutton_del(ctx: SnedSlashContext, button_id: int) -> None:
     except hikari.ForbiddenError:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Insufficient permissions",
-                description=f"The bot cannot see and/or read messages in the channel where the button is supposed to be located (<#{button.channel_id}>).",
+                title="❌ Недостаточно прав",
+                description=f"Бот не может видеть и/или читать сообщения на канале, где должна быть кнопка (<#{button.channel_id}>).",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -303,8 +304,8 @@ async def rolebutton_del(ctx: SnedSlashContext, button_id: int) -> None:
 
     await ctx.respond(
         embed=hikari.Embed(
-            title="✅ Deleted!",
-            description=f"Rolebutton **#{button.id}** was successfully deleted!",
+            title="✅ Успех",
+            description=f"Кнопка **#{button.id}** успешно удалена!",
             color=const.EMBED_GREEN,
         )
     )
@@ -314,28 +315,28 @@ async def rolebutton_del(ctx: SnedSlashContext, button_id: int) -> None:
 @lightbulb.add_checks(has_permissions(hikari.Permissions.MANAGE_ROLES))
 @lightbulb.option(
     "mode",
-    "The mode of operation for this rolebutton.",
-    choices=["Toggle - Add & remove roles (default)", "Add - Only add roles", "Remove - Only remove roles"],
+    "Режим работы кнопки",
+    choices=["Toggle - Добавление и удаление ролей (default)", "Add - Только добавление ролей", "Remove - Только удаление ролей"],
     required=False,
 )
 @lightbulb.option(
-    "style", "Change the style of the button.", choices=["Blurple", "Grey", "Red", "Green"], required=False
+    "style", "Изменить цвет кнопки", choices=["Blurple", "Grey", "Red", "Green"], required=False
 )
 @lightbulb.option(
-    "label", "Change the label that should appear on the button. Type 'removelabel' to remove it.", required=False
+    "label", "Измените текст кнопки. Для кнопки без текста наберите 'removelabel'", required=False
 )
-@lightbulb.option("emoji", "Change the emoji that should appear in the button.", type=hikari.Emoji, required=False)
-@lightbulb.option("role", "Change the role handed out by this button.", type=hikari.Role, required=False)
+@lightbulb.option("emoji", "Изменить emoji на кнопке", type=hikari.Emoji, required=False)
+@lightbulb.option("role", "Изменить выдаваемую роль", type=hikari.Role, required=False)
 @lightbulb.option(
-    "button_id", "The ID of the rolebutton to edit. You can get this via /rolebutton list", type=int, min_value=0
+    "button_id", "ID кнопки. Посмотреть можно командой /rolebutton list", type=int, min_value=0
 )
 @lightbulb.command(
     "edit",
-    "Edit an existing rolebutton.",
+    "Изменить существующую кнопку",
     pass_options=True,
 )
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def rolebutton_edit(ctx: SnedSlashContext, **kwargs) -> None:
+async def rolebutton_edit(ctx: ChenSlashContext, **kwargs) -> None:
     assert ctx.guild_id is not None and ctx.member is not None
     params = {opt: value for opt, value in kwargs.items() if value is not None}
 
@@ -344,8 +345,8 @@ async def rolebutton_edit(ctx: SnedSlashContext, **kwargs) -> None:
     if not button:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Not found",
-                description="There is no rolebutton by that ID. Check your existing rolebuttons via `/rolebutton list`",
+                title="❌ Не найдена",
+                description="Нет кнопки с таким ID. Посмотреть ID можно командой `/rolebutton list`",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -368,8 +369,8 @@ async def rolebutton_edit(ctx: SnedSlashContext, **kwargs) -> None:
         if role.is_managed or role.is_premium_subscriber_role:
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Role is managed",
-                    description="This role is managed by another integration and cannot be assigned manually to a user.",
+                    title="❌ Роль управляется",
+                    description="Роль управляется другой интеграцией и не может быть изменена",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -381,8 +382,8 @@ async def rolebutton_edit(ctx: SnedSlashContext, **kwargs) -> None:
         if not guild or not top_role:
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Caching error",
-                    description="Failed to resolve `top_role` and `guild` from cache. Please join our `/support` server for assistance.",
+                    title="❌ Ошибка кэшироания",
+                    description="Пожалуйста напишите администрации о получении данной ошибки",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -392,8 +393,8 @@ async def rolebutton_edit(ctx: SnedSlashContext, **kwargs) -> None:
         if role.position >= top_role.position and not guild.owner_id == ctx.member.id:
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Role Hierarchy Error",
-                    description="You cannot create rolebuttons for roles that are higher or equal to your highest role's position.",
+                    title="❌ Ошибка иерархии ролей",
+                    description="Вы не можете создать роль, которая выше вашей самой высокой роли",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -410,8 +411,8 @@ async def rolebutton_edit(ctx: SnedSlashContext, **kwargs) -> None:
     except hikari.ForbiddenError:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Insufficient permissions",
-                description=f"The bot cannot edit the provided message due to insufficient permissions.",
+                title="❌ Недостаточно прав",
+                description=f"Бот не может отредактировать сообщение.",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -419,8 +420,8 @@ async def rolebutton_edit(ctx: SnedSlashContext, **kwargs) -> None:
         return
 
     embed = hikari.Embed(
-        title="✅ Done!",
-        description=f"Rolebutton **#{button.id}** was updated!",
+        title="✅ Сделано",
+        description=f"Кнопка роли **#{button.id}** обновлена",
         color=const.EMBED_GREEN,
     )
     await ctx.respond(embed=embed)
@@ -430,26 +431,26 @@ async def rolebutton_edit(ctx: SnedSlashContext, **kwargs) -> None:
 @lightbulb.add_checks(has_permissions(hikari.Permissions.MANAGE_ROLES))
 @lightbulb.option(
     "mode",
-    "The mode of operation for this rolebutton.",
-    choices=["Toggle - Add & remove roles (default)", "Add - Only add roles", "Remove - Only remove roles"],
+    "Режим работы кнопки",
+    choices=["Toggle - Добавление и удаление ролей (default)", "Add - Только добавление ролей", "Remove - Только удаление ролей"],
     required=False,
 )
-@lightbulb.option("label", "The label that should appear on the button.", required=False)
-@lightbulb.option("style", "The style of the button.", choices=["Blurple", "Grey", "Red", "Green"], required=False)
-@lightbulb.option("emoji", "The emoji that should appear in the button.", type=str)
-@lightbulb.option("role", "The role that should be handed out by the button.", type=hikari.Role)
+@lightbulb.option("label", "Текст кнопки", required=False)
+@lightbulb.option("style", "Цвет кнопки.", choices=["Blurple", "Grey", "Red", "Green"], required=False)
+@lightbulb.option("emoji", "emoji на кнопке", type=str)
+@lightbulb.option("role", "Роль, которую должна выдавать кнопка", type=hikari.Role)
 @lightbulb.option(
     "message_link",
-    "The link of a message that MUST be from the bot, the rolebutton will be attached here.",
+    "Ссылка на сообщение, созданное этим ботом",
 )
 @lightbulb.command(
     "add",
-    "Add a new rolebutton.",
+    "Новая кнопка с ролью",
     pass_options=True,
 )
 @lightbulb.implements(lightbulb.SlashSubCommand)
 async def rolebutton_add(
-    ctx: SnedSlashContext,
+    ctx: ChenSlashContext,
     message_link: str,
     role: hikari.Role,
     emoji: str,
@@ -461,7 +462,7 @@ async def rolebutton_add(
     assert ctx.guild_id is not None and ctx.member is not None
 
     style = style or "Grey"
-    mode = mode or "Toggle - Add & remove roles"
+    mode = mode or "Toggle - Добавление и удаление ролей"
 
     message = await helpers.parse_message_link(ctx, message_link)
     if not message:
@@ -470,8 +471,8 @@ async def rolebutton_add(
     if message.author.id != ctx.app.user_id:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Message not authored by bot",
-                description="This message was not sent by the bot, and thus it cannot be edited to add the button.\n\n**Tip:** If you want to create a new message for the rolebutton with custom content, use the `/echo` or `/embed` command!",
+                title="❌ Сообщение создано не этим ботом",
+                description="Это сообщение нельзя отредактировать\n\nИспользуйте команды `/echo` или `/embed` для создания сообщения",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -481,8 +482,8 @@ async def rolebutton_add(
     if role.is_managed or role.is_premium_subscriber_role:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Role is managed",
-                description="This role is managed by another integration and cannot be assigned manually to a user.",
+                title="❌ Роль управляется",
+                description="Роль управляется другой интеграцией и не может быть изменена",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -495,8 +496,8 @@ async def rolebutton_add(
     if not guild or not top_role:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Caching error",
-                description="Failed to resolve `top_role` and `guild` from cache. Please join our `/support` server for assistance.",
+                title="❌ Ошибка кэширования",
+                description="Пожалуйста напишите администрации о получении данной ошибки",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -506,8 +507,8 @@ async def rolebutton_add(
     if role.position >= top_role.position and not guild.owner_id == ctx.member.id:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Role Hierarchy Error",
-                description="You cannot create rolebuttons for roles that are higher or equal to your highest role's position.",
+                title="❌ Ошибка иерархии ролей",
+                description="Вы не можете создать роль, которая выше вашей самой высокой роли",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -524,8 +525,8 @@ async def rolebutton_add(
     except ValueError:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Too many buttons",
-                description="This message has too many buttons attached to it already, please choose a different message!",
+                title="❌ Слишком много кнопок",
+                description="Прикреплено максимальное количество кнопок. Создайте новое сообщение",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -534,8 +535,8 @@ async def rolebutton_add(
     except hikari.ForbiddenError:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Insufficient permissions",
-                description=f"The bot cannot edit the provided message due to insufficient permissions.",
+                title="❌ Недостаточно прав",
+                description=f"Бот не может отредактировать сообщение",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -544,10 +545,10 @@ async def rolebutton_add(
 
     await ctx.respond(
         embed=hikari.Embed(
-            title="✅ Done!",
-            description=f"A new rolebutton for role {ctx.options.role.mention} in channel <#{message.channel_id}> has been created!",
+            title="✅ Сделано",
+            description=f"Новая кнопка с ролью {ctx.options.role.mention} в канале <#{message.channel_id}> создана",
             color=const.EMBED_GREEN,
-        ).set_footer(f"Button ID: {button.id}")
+        ).set_footer(f"ID кнопки: {button.id}")
     )
 
 
@@ -555,27 +556,27 @@ async def rolebutton_add(
 @lightbulb.add_checks(has_permissions(hikari.Permissions.MANAGE_ROLES))
 @lightbulb.option(
     "prompt_type",
-    "'add' is displayed to the user when the role is added, 'remove' is when it is removed.",
+    "'add' отображается при добавлении роли, 'remove' когда удаляется",
     choices=["add", "remove"],
 )
 @lightbulb.option(
     "button_id",
-    "The ID of the rolebutton to set a prompt for. You can get this via /rolebutton list",
+    "ID кнопки. Посмотреть ID командой /rolebutton list",
     type=int,
     min_value=0,
 )
 @lightbulb.command(
-    "setprompt", "Set a custom confirmation prompt to display when the button is clicked.", pass_options=True
+    "setprompt", "Пользовательское сообщение при добавлении или удалении роли", pass_options=True
 )
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def rolebutton_setprompt(ctx: SnedSlashContext, button_id: int, prompt_type: str) -> None:
+async def rolebutton_setprompt(ctx: ChenSlashContext, button_id: int, prompt_type: str) -> None:
 
     button = await RoleButton.fetch(button_id)
     if not button:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Not found",
-                description="There is no rolebutton by that ID. Check your existing rolebuttons via `/rolebutton list`",
+                title="❌ Кнопка не найдена",
+                description="Нет кнопки с указанным ID. Посмотреть ID можно командой `/rolebutton list`",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -586,11 +587,11 @@ async def rolebutton_setprompt(ctx: SnedSlashContext, button_id: int, prompt_typ
     await modal.send(ctx.interaction)
 
 
-def load(bot: SnedBot) -> None:
+def load(bot: ChenBot) -> None:
     bot.add_plugin(role_buttons)
 
 
-def unload(bot: SnedBot) -> None:
+def unload(bot: ChenBot) -> None:
     bot.remove_plugin(role_buttons)
 
 

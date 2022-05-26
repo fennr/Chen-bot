@@ -8,16 +8,16 @@ import lightbulb
 import miru
 
 from etc import constants as const
-from models import SnedBot
-from models import SnedSlashContext
+from models import ChenBot
+from models import ChenSlashContext
 from models import Timer
 from models import events
-from models.plugin import SnedPlugin
+from models.plugin import ChenPlugin
 from models.timer import TimerEvent
 from models.views import AuthorOnlyNavigator
 from utils import helpers
 
-reminders = SnedPlugin(name="Reminders")
+reminders = ChenPlugin(name="Reminders")
 
 logger = logging.getLogger(__name__)
 
@@ -26,17 +26,17 @@ class SnoozeSelect(miru.Select):
     def __init__(self) -> None:
         super().__init__(
             options=[
-                miru.SelectOption(label="5 minutes", value="5"),
-                miru.SelectOption(label="15 minutes", value="15"),
-                miru.SelectOption(label="30 minutes", value="30"),
-                miru.SelectOption(label="1 hour", value="60"),
-                miru.SelectOption(label="2 hours", value="120"),
-                miru.SelectOption(label="3 hours", value="180"),
-                miru.SelectOption(label="6 hours", value="360"),
-                miru.SelectOption(label="12 hours", value="720"),
-                miru.SelectOption(label="1 day", value="1440"),
+                miru.SelectOption(label="5 минут", value="5"),
+                miru.SelectOption(label="15 минут", value="15"),
+                miru.SelectOption(label="30 минут", value="30"),
+                miru.SelectOption(label="1 час", value="60"),
+                miru.SelectOption(label="2 часа", value="120"),
+                miru.SelectOption(label="3 часа", value="180"),
+                miru.SelectOption(label="6 часов", value="360"),
+                miru.SelectOption(label="12 часов", value="720"),
+                miru.SelectOption(label="1 день", value="1440"),
             ],
-            placeholder="Snooze reminder...",
+            placeholder="Отложить напоминание",
         )
 
     async def callback(self, ctx: miru.ViewContext) -> None:
@@ -45,11 +45,11 @@ class SnoozeSelect(miru.Select):
         expiry = helpers.utcnow() + datetime.timedelta(minutes=int(self.values[0]))
         assert (
             self.view.reminder_message.embeds[0].description
-            and isinstance(ctx.app, SnedBot)
+            and isinstance(ctx.app, ChenBot)
             and ctx.guild_id
             and isinstance(self.view, SnoozeView)
         )
-        message = self.view.reminder_message.embeds[0].description.split("\n\n[Jump to original message!](")[0]
+        message = self.view.reminder_message.embeds[0].description.split("\n\n[Перейти к оригинальному сообщению!](")[0]
 
         reminder_data = {
             "message": message,
@@ -69,12 +69,12 @@ class SnoozeSelect(miru.Select):
 
         await ctx.edit_response(
             embed=hikari.Embed(
-                title="✅ Reminder snoozed",
-                description=f"Reminder snoozed until: {helpers.format_dt(expiry)} ({helpers.format_dt(expiry, style='R')})\n\n**Message:**\n{message}",
+                title="✅ Напоминание отложено",
+                description=f"Напоминание отложено до: {helpers.format_dt(expiry)} ({helpers.format_dt(expiry, style='R')})\n\n**Message:**\n{message}",
                 color=const.EMBED_GREEN,
-            ).set_footer(f"Reminder ID: {timer.id}"),
+            ).set_footer(f"ID: {timer.id}"),
             components=miru.View()
-            .add_item(miru.Select(placeholder="Reminder snoozed!", options=[miru.SelectOption("foo")], disabled=True))
+            .add_item(miru.Select(placeholder="Напоминание отложено!", options=[miru.SelectOption("foo")], disabled=True))
             .build(),
             flags=hikari.MessageFlag.EPHEMERAL,
         )
@@ -94,7 +94,7 @@ class SnoozeView(miru.View):
 
 
 @reminders.listener(miru.ComponentInteractionCreateEvent, bind=True)
-async def reminder_component_handler(plugin: SnedPlugin, event: miru.ComponentInteractionCreateEvent) -> None:
+async def reminder_component_handler(plugin: ChenPlugin, event: miru.ComponentInteractionCreateEvent) -> None:
 
     if not event.context.custom_id.startswith(("RMSS:", "RMAR:")):
         return
@@ -107,8 +107,8 @@ async def reminder_component_handler(plugin: SnedPlugin, event: miru.ComponentIn
         if author_id != event.context.user.id:
             await event.context.respond(
                 embed=hikari.Embed(
-                    title="❌ Invalid interaction",
-                    description="You cannot snooze someone else's reminder!",
+                    title="❌ Недопустимое взаимодействие",
+                    description="Вы не можете отложить чужое напоминание!",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -125,8 +125,8 @@ async def reminder_component_handler(plugin: SnedPlugin, event: miru.ComponentIn
         view = SnoozeView(event.context.message)  # I literally added InteractionResponse just for this
         resp = await event.context.respond(
             embed=hikari.Embed(
-                title="🕔 Select a snooze duration!",
-                description="Select a duration to snooze the reminder for!",
+                title="🕔 Выберите продолжительность",
+                description="Выберите продолжительность на которую нужно отложить напоминание",
                 color=const.EMBED_BLUE,
             ),
             components=view.build(),
@@ -144,8 +144,8 @@ async def reminder_component_handler(plugin: SnedPlugin, event: miru.ComponentIn
         except ValueError:
             await event.context.respond(
                 embed=hikari.Embed(
-                    title="❌ Invalid interaction",
-                    description="Oops! It looks like this reminder is no longer valid!",
+                    title="❌ Недопустимое взаимодействие",
+                    description="Похоже это напоминание больше не действует",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -161,8 +161,8 @@ async def reminder_component_handler(plugin: SnedPlugin, event: miru.ComponentIn
         if timer.user_id == event.context.user.id:
             await event.context.respond(
                 embed=hikari.Embed(
-                    title="❌ Invalid interaction",
-                    description="You cannot do this on your own reminder.",
+                    title="❌ Некорректное взаимодействие",
+                    description="Вы не можете это сделать в собственном напоминании",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -177,8 +177,8 @@ async def reminder_component_handler(plugin: SnedPlugin, event: miru.ComponentIn
             if len(notes["additional_recipients"]) > 50:
                 await event.context.respond(
                     embed=hikari.Embed(
-                        title="❌ Invalid interaction",
-                        description="Oops! Looks like too many people signed up for this reminder. Try creating a new reminder! (Max cap: 50)",
+                        title="❌ Некорректное взаимодействие",
+                        description="Слишком много людей подписались на это напоминание. Попробуйте создать новое напоминание",
                         color=const.ERROR_COLOR,
                     ),
                     flags=hikari.MessageFlag.EPHEMERAL,
@@ -190,8 +190,8 @@ async def reminder_component_handler(plugin: SnedPlugin, event: miru.ComponentIn
             await plugin.app.scheduler.update_timer(timer)
             await event.context.respond(
                 embed=hikari.Embed(
-                    title="✅ Signed up to reminder",
-                    description="You will be notified when this reminder is due!",
+                    title="✅ Подписался на напоминание",
+                    description="В заданное время вам придет уведомление",
                     color=const.EMBED_GREEN,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -203,8 +203,8 @@ async def reminder_component_handler(plugin: SnedPlugin, event: miru.ComponentIn
             await plugin.app.scheduler.update_timer(timer)
             await event.context.respond(
                 embed=hikari.Embed(
-                    title="✅ Removed from reminder",
-                    description="Removed you from the list of recipients!",
+                    title="✅ Удален из напоминания",
+                    description="Удален из списка получателей сообщения",
                     color=const.EMBED_GREEN,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -212,28 +212,28 @@ async def reminder_component_handler(plugin: SnedPlugin, event: miru.ComponentIn
 
 
 @reminders.command
-@lightbulb.command("reminder", "Manage reminders!")
+@lightbulb.command("reminder", "Управление напоминаниями")
 @lightbulb.implements(lightbulb.SlashCommandGroup)
-async def reminder(ctx: SnedSlashContext) -> None:
+async def reminder(ctx: ChenSlashContext) -> None:
     pass
 
 
 @reminder.child
-@lightbulb.option("message", "The message that should be sent to you when this reminder expires.")
+@lightbulb.option("message", "Сообщение, которое будет отправлено в заданное время")
 @lightbulb.option(
-    "when", "When this reminder should expire. Examples: 'in 10 minutes', 'tomorrow at 20:00', '2022-04-01'"
+    "when", "Когда должно быть получено напоминание. Пример: 'через 10 минут', '2022-03-01', 'завтра в 20:00'"
 )
-@lightbulb.command("create", "Create a new reminder.", pass_options=True)
+@lightbulb.command("create", "Создать новое напоминание", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def reminder_create(ctx: SnedSlashContext, when: str, message: t.Optional[str] = None) -> None:
+async def reminder_create(ctx: ChenSlashContext, when: str, message: t.Optional[str] = None) -> None:
 
     assert ctx.guild_id is not None
 
     if message and len(message) >= 1000:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Reminder too long",
-                description="Your reminder cannot exceed **1000** characters!",
+                title="❌ Слишком длинное напоминание",
+                description="Сообщение не может превышать по длине **1000** символов!",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -246,8 +246,8 @@ async def reminder_create(ctx: SnedSlashContext, when: str, message: t.Optional[
     except ValueError as error:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid data entered",
-                description=f"Your timeformat is invalid! \n**Error:** {error}",
+                title="❌ Некорректная дата",
+                description=f"**Error:** {error}",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -257,8 +257,8 @@ async def reminder_create(ctx: SnedSlashContext, when: str, message: t.Optional[
     if (time - helpers.utcnow()).total_seconds() >= 31536000 * 5:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid data entered",
-                description="Sorry, but that's a bit too far in the future.",
+                title="❌ Некорректная дата",
+                description="Попытка отправить сообщение в слишком далекое будущее",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -268,8 +268,8 @@ async def reminder_create(ctx: SnedSlashContext, when: str, message: t.Optional[
     if (time - helpers.utcnow()).total_seconds() < 10:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid data entered",
-                description="Sorry, but that's a bit too short, reminders must last longer than `10` seconds.",
+                title="❌ Некорректная дата",
+                description="Время напоминания должно быть хотя бы на 1 минуту позднее создания напоминания",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -293,12 +293,12 @@ async def reminder_create(ctx: SnedSlashContext, when: str, message: t.Optional[
 
     proxy = await ctx.respond(
         embed=hikari.Embed(
-            title="✅ Reminder set",
-            description=f"Reminder set for: {helpers.format_dt(time)} ({helpers.format_dt(time, style='R')})\n\n**Message:**\n{message}",
+            title="✅ Напоминания",
+            description=f"Напоминания для: {helpers.format_dt(time)} ({helpers.format_dt(time, style='R')})\n\n**Сообщение:**\n{message}",
             color=const.EMBED_GREEN,
         ).set_footer(f"Reminder ID: {timer.id}"),
         components=miru.View()
-        .add_item(miru.Button(label="Remind me too!", emoji="✉️", custom_id=f"RMAR:{timer.id}"))
+        .add_item(miru.Button(label="Напомни и мне!", emoji="✉️", custom_id=f"RMAR:{timer.id}"))
         .build(),
     )
     reminder_data["jump_url"] = (await proxy.message()).make_link(ctx.guild_id)
@@ -308,10 +308,10 @@ async def reminder_create(ctx: SnedSlashContext, when: str, message: t.Optional[
 
 
 @reminder.child
-@lightbulb.option("id", "The ID of the timer to delete. You can get this via /reminder list", type=int)
-@lightbulb.command("delete", "Delete a currently pending reminder.", pass_options=True)
+@lightbulb.option("id", "ID таймера, который необходимо удалить. Посмотреть можно через /reminder list", type=int)
+@lightbulb.command("delete", "Удалить напоминание", pass_options=True)
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def reminder_del(ctx: SnedSlashContext, id: int) -> None:
+async def reminder_del(ctx: ChenSlashContext, id: int) -> None:
 
     assert ctx.guild_id is not None
 
@@ -320,8 +320,8 @@ async def reminder_del(ctx: SnedSlashContext, id: int) -> None:
     except ValueError:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Reminder not found",
-                description=f"Cannot find reminder with ID **{id}**.",
+                title="❌ Напоминание не найдено",
+                description=f"Не найдено напоминание с ID **{id}**.",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -330,17 +330,17 @@ async def reminder_del(ctx: SnedSlashContext, id: int) -> None:
 
     await ctx.respond(
         embed=hikari.Embed(
-            title="✅ Reminder deleted",
-            description=f"Reminder **{id}** has been deleted.",
+            title="✅ Напоминание удалено",
+            description=f"Напоминание **{id}** успешно удалено",
             color=const.EMBED_GREEN,
         )
     )
 
 
 @reminder.child
-@lightbulb.command("list", "List your currently pending reminders.")
+@lightbulb.command("list", "Список текущих напоминаний")
 @lightbulb.implements(lightbulb.SlashSubCommand)
-async def reminder_list(ctx: SnedSlashContext) -> None:
+async def reminder_list(ctx: ChenSlashContext) -> None:
     records = await ctx.app.db.fetch(
         """SELECT * FROM timers WHERE guild_id = $1 AND user_id = $2 AND event = 'reminder' ORDER BY expires""",
         ctx.guild_id,
@@ -350,8 +350,8 @@ async def reminder_list(ctx: SnedSlashContext) -> None:
     if not records:
         await ctx.respond(
             embed=hikari.Embed(
-                title="✉️ No pending reminders!",
-                description="You have no pending reminders. You can create one via `/reminder create`!",
+                title="✉️ Нет напоминаний",
+                description="Вы можете создать напоминания командой `/reminder create`!",
                 color=const.WARN_COLOR,
             )
         )
@@ -372,7 +372,7 @@ async def reminder_list(ctx: SnedSlashContext) -> None:
     reminders = [reminders[i * 10 : (i + 1) * 10] for i in range((len(reminders) + 10 - 1) // 10)]
 
     pages = [
-        hikari.Embed(title="✉️ Your reminders:", description="\n".join(content), color=const.EMBED_BLUE)
+        hikari.Embed(title="✉️ Ваши напоминания:", description="\n".join(content), color=const.EMBED_BLUE)
         for content in reminders
     ]
     # TODO: wtf
@@ -381,7 +381,7 @@ async def reminder_list(ctx: SnedSlashContext) -> None:
 
 
 @reminders.listener(events.TimerCompleteEvent, bind=True)
-async def on_reminder(plugin: SnedPlugin, event: events.TimerCompleteEvent):
+async def on_reminder(plugin: ChenPlugin, event: events.TimerCompleteEvent):
     """
     Listener for expired reminders
     """
@@ -406,8 +406,8 @@ async def on_reminder(plugin: SnedPlugin, event: events.TimerCompleteEvent):
     assert event.timer.notes is not None
     notes = json.loads(event.timer.notes)
     embed = hikari.Embed(
-        title=f"✉️ {user.display_name}, your {'snoozed ' if notes.get('is_snoozed') else ''}reminder:",
-        description=f"{notes['message']}\n\n[Jump to original message!]({notes['jump_url']})",
+        title=f"✉️ {user.display_name}, {'отложенное ' if notes.get('is_snoozed') else ''}напоминание:",
+        description=f"{notes['message']}\n\n[Перейти к оригинальному сообщению!]({notes['jump_url']})",
         color=const.EMBED_BLUE,
     )
 
@@ -425,7 +425,7 @@ async def on_reminder(plugin: SnedPlugin, event: events.TimerCompleteEvent):
             content=" ".join(pings),
             embed=embed,
             components=miru.View()
-            .add_item(miru.Button(emoji="🕔", label="Snooze!", custom_id=f"RMSS:{event.timer.user_id}"))
+            .add_item(miru.Button(emoji="🕔", label="Отложить", custom_id=f"RMSS:{event.timer.user_id}"))
             .build(),
             user_mentions=True,
         )
@@ -436,19 +436,19 @@ async def on_reminder(plugin: SnedPlugin, event: events.TimerCompleteEvent):
     ):
         try:
             await user.send(
-                content="I lost access to the channel this reminder was sent from, so here it is!",
+                content="Потерян доступ к каналу, с которорого было отправлено сообщение",
                 embed=embed,
             )
 
         except hikari.ForbiddenError:
-            logger.info(f"Failed to deliver a reminder to user {user}.")
+            logger.info(f"Не удалось доставить напоминание пользователю {user}.")
 
 
-def load(bot: SnedBot) -> None:
+def load(bot: ChenBot) -> None:
     bot.add_plugin(reminders)
 
 
-def unload(bot: SnedBot) -> None:
+def unload(bot: ChenBot) -> None:
     bot.remove_plugin(reminders)
 
 

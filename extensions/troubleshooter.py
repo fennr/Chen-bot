@@ -6,13 +6,13 @@ import lightbulb
 
 from etc import constants as const
 from etc import get_perm_str
-from models import SnedSlashContext
-from models.bot import SnedBot
-from models.plugin import SnedPlugin
+from models import ChenSlashContext
+from models.bot import ChenBot
+from models.plugin import ChenPlugin
 
 logger = logging.getLogger(__name__)
 
-troubleshooter = SnedPlugin("Troubleshooter")
+troubleshooter = ChenPlugin("Troubleshooter")
 
 # Find perms issues
 # Find automod config issues
@@ -45,34 +45,34 @@ REQUIRED_PERMISSIONS = (
 
 # Explain why the bot requires the perm
 PERM_DESCRIPTIONS = {
-    hikari.Permissions.VIEW_AUDIT_LOG: "Required in logs to fill in details such as who the moderator in question was, or the reason of the action.",
-    hikari.Permissions.MANAGE_ROLES: "Required to give users roles via role-buttons.",
-    hikari.Permissions.MANAGE_CHANNELS: "Used by `/slowmode` to set a custom slow mode duration for the channel.",
-    hikari.Permissions.MANAGE_THREADS: "Used by `/slowmode` to set a custom slow mode duration for the thread.",
-    hikari.Permissions.MANAGE_NICKNAMES: "Used by `/deobfuscate` to deobfuscate other user's nicknames.",
-    hikari.Permissions.KICK_MEMBERS: "Required to use the `/kick` command and let auto-moderation actions kick users.",
-    hikari.Permissions.BAN_MEMBERS: "Required to use the `/ban`, `/softban`, `/massban` command and let auto-moderation actions ban users.",
-    hikari.Permissions.CHANGE_NICKNAME: "Required for the `/setnick` command.",
-    hikari.Permissions.READ_MESSAGE_HISTORY: "Required for auto-moderation, starboard, `/edit`, and other commands that may require to fetch messages.",
-    hikari.Permissions.VIEW_CHANNEL: "Required for auto-moderation, starboard, `/edit`, and other commands that may require to fetch messages.",
-    hikari.Permissions.SEND_MESSAGES: "Required to send messages independently of commands, this includes `/echo`, `/edit`, logging, starboard, reports and auto-moderation.",
-    hikari.Permissions.CREATE_PUBLIC_THREADS: "Required for the bot to access and manage threads.",
-    hikari.Permissions.CREATE_PRIVATE_THREADS: "Required for the bot to access and manage threads.",
-    hikari.Permissions.SEND_MESSAGES_IN_THREADS: "Required for the bot to access and manage threads.",
-    hikari.Permissions.EMBED_LINKS: "Required for the bot to create embeds to display content, without this you may not see any responses from the bot, including this one :)",
-    hikari.Permissions.ATTACH_FILES: "Required for the bot to attach files to a message, for example to send a list of users to be banned in `/massban`.",
-    hikari.Permissions.MENTION_ROLES: "Required for the bot to always be able to mention roles, for example when reporting users. The bot will **never** mention @everyone or @here.",
-    hikari.Permissions.USE_EXTERNAL_EMOJIS: "Required to display certain content with custom emojies, typically to better illustrate certain content.",
-    hikari.Permissions.ADD_REACTIONS: "This permission is used for creating giveaways and adding the initial reaction to the giveaway message.",
-    hikari.Permissions.MODERATE_MEMBERS: "Required to use the `/timeout` command and let auto-moderation actions timeout users.",
-    hikari.Permissions.MANAGE_MESSAGES: "This permission is required to delete other user's messages, for example in the case of auto-moderation.",
+    hikari.Permissions.VIEW_AUDIT_LOG: "Требуется заполнить в журнал детали, такие как кто модератор, о ком речь, какая причина",
+    hikari.Permissions.MANAGE_ROLES: "Треубется чтобы выдавать пользователям роли с помощью кнопок",
+    hikari.Permissions.MANAGE_CHANNELS: "Используется для `/slowmode` чтобы установить слоу-мод на канале",
+    hikari.Permissions.MANAGE_THREADS: "Используется для `/slowmode` чтобы установить слоу-мод в ветке",
+    hikari.Permissions.MANAGE_NICKNAMES: "Используется для изменения ника в `/setnick`",
+    hikari.Permissions.KICK_MEMBERS: "Требуется для использования команды `/kick`",
+    hikari.Permissions.BAN_MEMBERS: "Требуется для использования команд `/ban`, `/softban`, `/massban`",
+    hikari.Permissions.CHANGE_NICKNAME: "Используется для изменения ника в `/setnick`",
+    hikari.Permissions.READ_MESSAGE_HISTORY: "Требуется для множества команд, требующих чтения сообщений",
+    hikari.Permissions.VIEW_CHANNEL: "Требуется для множества команд, требующих чтения сообщений",
+    hikari.Permissions.SEND_MESSAGES: "Требуется для отправки сообщений с помощью `/echo`, `/edit`, логирования, репортов и других команд",
+    hikari.Permissions.CREATE_PUBLIC_THREADS: "Требуется для доступа к веткам",
+    hikari.Permissions.CREATE_PRIVATE_THREADS: "Требуется для доступа к веткам",
+    hikari.Permissions.SEND_MESSAGES_IN_THREADS: "Требуется для доступа к веткам",
+    hikari.Permissions.EMBED_LINKS: "Требуется для создания ботом embed сообщений. Без этого разрешения бот не сможет отправить ни одно сообщение",
+    hikari.Permissions.ATTACH_FILES: "Требуется для отправки файлов. Используется в команде `/massban`.",
+    hikari.Permissions.MENTION_ROLES: "Требуется, чтобы бот мог упоминать роли. Ни одна команда **не использует** упоминания @everyone или @here",
+    hikari.Permissions.USE_EXTERNAL_EMOJIS: "Требуется для отображения смайликов в сообщениях",
+    hikari.Permissions.ADD_REACTIONS: "Требуется для создания начальных реакций на сообщение",
+    hikari.Permissions.MODERATE_MEMBERS: "Требуется для использования команды `/timeout`",
+    hikari.Permissions.MANAGE_MESSAGES: "Требуется для возможности удалять сообщения других пользователей",
 }
 
 
 @troubleshooter.command
-@lightbulb.command("troubleshoot", "Diagnose and locate common configuration issues.")
+@lightbulb.command("troubleshoot", "Диагностика возможных проблем")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def troubleshoot(ctx: SnedSlashContext) -> None:
+async def troubleshoot(ctx: ChenSlashContext) -> None:
 
     assert ctx.guild_id is not None
 
@@ -84,33 +84,33 @@ async def troubleshoot(ctx: SnedSlashContext) -> None:
     content = []
 
     if missing_perms is not hikari.Permissions.NONE:
-        content.append("**Missing Permissions:**")
+        content.append("**Отсутствуют права:**")
         content += [
             f"❌ **{get_perm_str(perm)}**: {desc}" for perm, desc in PERM_DESCRIPTIONS.items() if missing_perms & perm
         ]
 
     if not content:
         embed = hikari.Embed(
-            title="✅ No problems found!",
-            description="If you believe there is an issue with Sned, found a bug, or simply have a question, please join the [support server!](https://discord.gg/KNKr8FPmJa)",
+            title="✅ Проблем с правами не найдено",
+            description="Если вы все же столкнулись с проблемой, напишите мне на [сервер Samuro_dev](https://discord.gg/qxy6WE9cke)",
             color=const.EMBED_GREEN,
         )
     else:
         content = "\n".join(content)
         embed = hikari.Embed(
-            title="Uh Oh!",
-            description=f"It looks like there may be some issues with the configuration. Please review the list below!\n\n{content}\n\nIf you need any assistance resolving these issues, please join the [support server!](https://discord.gg/KNKr8FPmJa)",
+            title="О, нет!",
+            description=f"Похоже, что боту не хватает прав для выполнения некоторых действий\n\n{content}\n\nЕсли вы не можете самостоятельно решить проблему, напишите мне на [сервер Samuro_dev](https://discord.gg/qxy6WE9cke)",
             color=const.ERROR_COLOR,
         )
 
     await ctx.mod_respond(embed=embed)
 
 
-def load(bot: SnedBot) -> None:
+def load(bot: ChenBot) -> None:
     bot.add_plugin(troubleshooter)
 
 
-def unload(bot: SnedBot) -> None:
+def unload(bot: ChenBot) -> None:
     bot.remove_plugin(troubleshooter)
 
 

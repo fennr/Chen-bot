@@ -6,26 +6,26 @@ import lightbulb
 import miru
 
 from etc import constants as const
-from models import SnedSlashContext
-from models.bot import SnedBot
+from models import ChenSlashContext
+from models.bot import ChenBot
 from models.context import SnedContext
-from models.context import SnedMessageContext
-from models.context import SnedUserContext
-from models.plugin import SnedPlugin
+from models.context import ChenMessageContext
+from models.context import ChenUserContext
+from models.plugin import ChenPlugin
 from utils import helpers
 
 logger = logging.getLogger(__name__)
 
-reports = SnedPlugin("Reports")
+reports = ChenPlugin("Reports")
 
 
 class ReportModal(miru.Modal):
     def __init__(self, member: hikari.Member) -> None:
-        super().__init__(f"Reporting {member}", autodefer=False)
+        super().__init__(f"Репорт на {member}", autodefer=False)
         self.add_item(
             miru.TextInput(
-                label="Reason for the Report",
-                placeholder="Please enter why you believe this user should be investigated...",
+                label="Причина репорта",
+                placeholder="Пожалуйста, укажите причину...",
                 style=hikari.TextInputStyle.PARAGRAPH,
                 max_length=1000,
                 required=True,
@@ -33,8 +33,8 @@ class ReportModal(miru.Modal):
         )
         self.add_item(
             miru.TextInput(
-                label="Additional Context",
-                placeholder="If you have any additional information or proof (e.g. screenshots), please link them here.",
+                label="Дополнительный контекст",
+                placeholder="Более детальное описание поможет рассмотреть вопрос быстрее...",
                 style=hikari.TextInputStyle.PARAGRAPH,
                 max_length=1000,
             )
@@ -49,9 +49,9 @@ class ReportModal(miru.Modal):
         for item, value in ctx.values.items():
             assert isinstance(item, miru.TextInput)
 
-            if item.label == "Reason for the Report":
+            if item.label == "Причина репорта":
                 self.reason = value
-            elif item.label == "Additional Context":
+            elif item.label == "Дополнительный контекст":
                 self.info = value
 
         await ctx.defer(flags=hikari.MessageFlag.EPHEMERAL)
@@ -63,8 +63,8 @@ async def report_error(ctx: SnedContext) -> None:
 
     await ctx.respond(
         embed=hikari.Embed(
-            title="❌ Oops!",
-            description=f"It looks like the moderators of **{guild.name}** did not enable this functionality.",
+            title="❌ Ошибка",
+            description=f"Похоже администрация **{guild.name}** не включила в настройках данную команду",
             color=const.ERROR_COLOR,
         ),
         flags=hikari.MessageFlag.EPHEMERAL,
@@ -74,8 +74,8 @@ async def report_error(ctx: SnedContext) -> None:
 async def report_perms_error(ctx: SnedContext) -> None:
     await ctx.respond(
         embed=hikari.Embed(
-            title="❌ Oops!",
-            description=f"It looks like I do not have permissions to create a message in the reports channel. Please notify an administrator!",
+            title="❌ Ошибка",
+            description=f"Похоже недостаточно прав для создания сообщения. Сообщите об этой ошибке администратору сообщества",
             color=const.ERROR_COLOR,
         ),
         flags=hikari.MessageFlag.EPHEMERAL,
@@ -89,8 +89,8 @@ async def report(ctx: SnedContext, member: hikari.Member, message: t.Optional[hi
     if member.id == ctx.member.id or member.is_bot:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Huh?",
-                description=f"I'm not sure how that would work...",
+                title="❌ ???",
+                description=f"Нельзя выбрать себя или бота",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -139,12 +139,12 @@ async def report(ctx: SnedContext, member: hikari.Member, message: t.Optional[hi
     role_mentions = [role.mention for role in roles if role is not None]
 
     embed = hikari.Embed(
-        title="⚠️ New Report",
+        title="⚠️ Новое сообщение",
         description=f"""
-**Reporter:** {ctx.member.mention} `({ctx.member.id})`
-**Reported User:**  {member.mention} `({member.id})`
-**Reason:** ```{modal.reason}```
-**Additional Context:** ```{modal.info or "Not provided."}```""",
+**От:** {ctx.member.mention} `({ctx.member.id})`
+**Репорт на:**  {member.mention} `({member.id})`
+**Причина:** ```{modal.reason}```
+**Дополнительный контекст:** ```{modal.info or "Отсутствует"}```""",
         color=const.WARN_COLOR,
     )
 
@@ -160,8 +160,8 @@ async def report(ctx: SnedContext, member: hikari.Member, message: t.Optional[hi
     )
     await modal.get_response_context().respond(
         embed=hikari.Embed(
-            title="✅ Report Submitted",
-            description="A moderator will review your report shortly!",
+            title="✅ Сообщение отправлено",
+            description="Модерация рассмотрит сообщение в ближайшее время",
             color=const.EMBED_GREEN,
         ),
         flags=hikari.MessageFlag.EPHEMERAL,
@@ -169,35 +169,35 @@ async def report(ctx: SnedContext, member: hikari.Member, message: t.Optional[hi
 
 
 @reports.command
-@lightbulb.option("user", "The user that is to be reported.", type=hikari.Member, required=True)
-@lightbulb.command("report", "Report a user to the moderation team of this server.", pass_options=True)
+@lightbulb.option("user", "Пользователь нарушивший правила", type=hikari.Member, required=True)
+@lightbulb.command("report", "Сообщить о нарушении", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def report_cmd(ctx: SnedSlashContext, user: hikari.Member) -> None:
+async def report_cmd(ctx: ChenSlashContext, user: hikari.Member) -> None:
     helpers.is_member(user)
     await report(ctx, user)
 
 
 @reports.command
-@lightbulb.command("Report User", "Report the targeted user to the moderation team of this server.", pass_options=True)
+@lightbulb.command("Report User", "Сообщить о пользователе модераторам", pass_options=True)
 @lightbulb.implements(lightbulb.UserCommand)
-async def report_user_cmd(ctx: SnedUserContext, target: hikari.Member) -> None:
+async def report_user_cmd(ctx: ChenUserContext, target: hikari.Member) -> None:
     helpers.is_member(target)
     await report(ctx, ctx.options.target)
 
 
 @reports.command
 @lightbulb.command(
-    "Report Message", "Report the targeted message to the moderation team of this server.", pass_options=True
+    "Report Message", "Сообщить о сообщении модераторам", pass_options=True
 )
 @lightbulb.implements(lightbulb.MessageCommand)
-async def report_msg_cmd(ctx: SnedMessageContext, target: hikari.Message) -> None:
+async def report_msg_cmd(ctx: ChenMessageContext, target: hikari.Message) -> None:
     assert ctx.guild_id is not None
     member = ctx.app.cache.get_member(ctx.guild_id, target.author)
     if not member:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Oops!",
-                description="It looks like the author of this message already left the server!",
+                title="❌ Ошибка",
+                description="Похоже автор сообщения уже покинул сервер",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -207,11 +207,11 @@ async def report_msg_cmd(ctx: SnedMessageContext, target: hikari.Message) -> Non
     await report(ctx, member, ctx.options.target)
 
 
-def load(bot: SnedBot) -> None:
+def load(bot: ChenBot) -> None:
     bot.add_plugin(reports)
 
 
-def unload(bot: SnedBot) -> None:
+def unload(bot: ChenBot) -> None:
     bot.remove_plugin(reports)
 
 

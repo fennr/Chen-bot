@@ -23,6 +23,8 @@ from models.events import WarnsClearEvent
 from models.plugin import ChenPlugin
 from utils import helpers
 
+from pprint import pprint
+
 logger = logging.getLogger(__name__)
 
 userlog = ChenPlugin("Logging", include_datastore=True)
@@ -290,9 +292,8 @@ async def find_auditlog_data(
         async for log in userlog.app.rest.fetch_audit_log(guild, event_type=event_type):
             for entry in log.entries.values():
                 # We do not want to return entries older than 15 seconds
-                if (helpers.utcnow() - entry.id.created_at).total_seconds() > 30 or count >= 5:
+                if (helpers.utcnow() - entry.id.created_at).total_seconds() > 130 or count >= 5:
                     return
-                print(entry)
                 if user_id and user_id == entry.target_id:
                     return entry
                 elif user_id:
