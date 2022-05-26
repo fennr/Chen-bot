@@ -133,3 +133,4 @@ config.py
 
 # DB backup files
 *.pgdmp
+.idea

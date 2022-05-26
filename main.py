@@ -4,7 +4,7 @@ import logging
 import os
 import platform
 
-from models import SnedBot
+from models import ChenBot
 
 if int(platform.python_version_tuple()[1]) < 10:
     logging.fatal("Python version must be 3.10 or greater! Exiting...")
@@ -38,7 +38,7 @@ if os.name != "nt":  # Lol imagine using Windows
     else:
         uvloop.install()
 
-bot = SnedBot(Config())
+bot = ChenBot(Config())
 
 if __name__ == "__main__":
     bot.run()
