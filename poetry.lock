@@ -228,11 +228,14 @@ multidict = ">=6.0,<7.0"
 server = ["pynacl (>=1.5,<2.0)"]
 speedups = ["aiodns (>=3.0,<4.0)", "cchardet (>=2.1,<3.0)", "Brotli (>=1.0,<2.0)", "ciso8601 (>=2.2,<3.0)"]
 
-[package.source]
-type = "git"
-url = "https://github.com/HyperGH/hikari"
-reference = "master"
-resolved_reference = "3e605a81c72ec9fa54dd667c0ffa392f44729751"
+[[package]]
+name = "hikari"
+version = "2.0.0.dev108"
+description = "A sane Discord API for Python 3 built on asyncio and good intentions"
+category = "main"
+optional = false
+python-versions = ">=3.8.0,<3.11"
+develop = false
 
 [[package]]
 name = "hikari-lightbulb"
