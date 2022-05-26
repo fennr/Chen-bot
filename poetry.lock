@@ -244,7 +244,7 @@ python-versions = ">=3.8.0,<3.11"
 develop = false
 
 [package.dependencies]
-hikari = {git = "https://github.com/HyperGH/hikari", branch = "master"}
+hikari = ">=2.0.0"
 
 [package.extras]
 crontrigger = ["croniter (>=1.3.4,<1.4.0)", "types-croniter (>=1.0.10,<1.1.0)"]
