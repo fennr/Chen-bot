@@ -254,7 +254,7 @@ crontrigger = ["croniter (>=1.3.4,<1.4.0)", "types-croniter (>=1.0.10,<1.1.0)"]
 
 [[package]]
 name = "hikari-miru"
-version = "1.2.0"
+version = ">=1.1"
 description = "An alternative component handler for hikari, inspired by discord.py's views."
 category = "main"
 optional = false
