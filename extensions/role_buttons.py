@@ -278,7 +278,7 @@ async def rolebutton_del(ctx: ChenSlashContext, button_id: int) -> None:
 
     button = await RoleButton.fetch(button_id)
 
-    if not button:
+    if not button or button.guild_id != ctx.guild_id:
         await ctx.respond(
             embed=hikari.Embed(
                 title="❌ Не найдена",
@@ -342,7 +342,7 @@ async def rolebutton_edit(ctx: ChenSlashContext, **kwargs) -> None:
 
     button = await RoleButton.fetch(params.pop("button_id"))
 
-    if not button:
+    if not button or button.guild_id != ctx.guild_id:
         await ctx.respond(
             embed=hikari.Embed(
                 title="❌ Не найдена",
@@ -572,7 +572,7 @@ async def rolebutton_add(
 async def rolebutton_setprompt(ctx: ChenSlashContext, button_id: int, prompt_type: str) -> None:
 
     button = await RoleButton.fetch(button_id)
-    if not button:
+    if not button or button.guild_id != ctx.guild_id:
         await ctx.respond(
             embed=hikari.Embed(
                 title="❌ Кнопка не найдена",
