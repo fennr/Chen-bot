@@ -6,8 +6,8 @@ from models.mod_actions import ModerationFlags
 # Static values for the settings extension
 
 mod_flags_strings = {
-    ModerationFlags.DM_USERS_ON_PUNISH: "DM users after punishment",
-    ModerationFlags.IS_EPHEMERAL: "Send mod commands ephemerally",
+    ModerationFlags.DM_USERS_ON_PUNISH: "Сообщение пользователю после предупржедения",
+    ModerationFlags.IS_EPHEMERAL: "Отправить эфемерное соообщение",
 }
 
 default_automod_policies = {
@@ -265,21 +265,21 @@ After enabling the policy, you can set different bounds for the different attrib
 }
 
 log_event_strings = {
-    "ban": "Ban",
-    "kick": "Kick",
-    "timeout": "Timeout",
-    "message_delete": "Message Deletion",
-    "message_delete_mod": "Message Deletion by Mod",
-    "message_edit": "Message Edits",
-    "bulk_delete": "Message Purging",
-    "flags": "Auto-Mod Flagging",
-    "roles": "Roles",
-    "channels": "Channels",
-    "member_join": "Member join",
-    "member_leave": "Member leave",
-    "nickname": "Nickname change",
-    "guild_settings": "Server settings",
-    "warn": "Warnings",
+    "ban": "Бан",
+    "kick": "Кик",
+    "timeout": "Таймаут",
+    "message_delete": "Удаление сообщения",
+    "message_delete_mod": "Удаление модератором",
+    "message_edit": "Редактирование сообщения",
+    "bulk_delete": "Удаление через purge",
+    "flags": "Автомодерация",
+    "roles": "Роли",
+    "channels": "Каналы",
+    "member_join": "Пользователь пришел",
+    "member_leave": "Пользователь ушел",
+    "nickname": "Смена ника",
+    "guild_settings": "Настройки сервера",
+    "warn": "Предупреждения",
 }
 
 # Copyright (C) 2022-present HyperGH
