@@ -211,7 +211,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "hikari"
-version = "2.0.0.dev109"
+version = "2.0.0.dev108"
 description = "A sane Discord API for Python 3 built on asyncio and good intentions"
 category = "main"
 optional = false
@@ -236,7 +236,7 @@ resolved_reference = "3e605a81c72ec9fa54dd667c0ffa392f44729751"
 
 [[package]]
 name = "hikari-lightbulb"
-version = "2.2.2"
+version = "2.2.1"
 description = "A simple to use command handler for Hikari"
 category = "main"
 optional = false
