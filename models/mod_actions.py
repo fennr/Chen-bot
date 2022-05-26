@@ -219,7 +219,10 @@ class ModActions:
             if item.custom_id == event.custom_id:
                 item.disabled = True
 
-        await event.message.edit(components=view)
+        try:
+            await event.message.edit(components=view)
+        except:
+            logging.error("Ошибка в mod_action из-за эфемерного сообщения")
 
     async def timeout_extend(self, event: TimerCompleteEvent) -> None:
         """
