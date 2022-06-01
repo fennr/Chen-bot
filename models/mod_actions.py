@@ -9,7 +9,7 @@ import attr
 import hikari
 import lightbulb
 import miru
-from miru.abc import ViewItem
+#from miru.abc import ViewItem
 
 from etc import constants as const
 from models.db_user import DatabaseUser
@@ -214,10 +214,10 @@ class ModActions:
 
         view = miru.View.from_message(event.message)
 
-        for item in view.children:
+        '''for item in view.children:
             assert isinstance(item, ViewItem)
             if item.custom_id == event.custom_id:
-                item.disabled = True
+                item.disabled = True'''
 
         try:
             await event.message.edit(components=view)
