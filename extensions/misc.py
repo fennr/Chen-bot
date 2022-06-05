@@ -72,7 +72,7 @@ async def ping(ctx: ChenSlashContext) -> None:
 )
 @lightbulb.option("footer", "Подвал эмбеда", required=False)
 @lightbulb.option("description", "Описание эмбеда", required=False)
-@lightbulb.option("title", "Заголовок эмбеда. Обязателен!")
+@lightbulb.option("title", "Заголовок эмбеда. Обязателен!", required=False)
 @lightbulb.command("embed", "Сгенерировать новое embed-сообщение с параметрами")
 @lightbulb.implements(lightbulb.SlashCommand)
 async def embed(ctx: ChenSlashContext) -> None:
