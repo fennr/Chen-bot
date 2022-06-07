@@ -82,7 +82,7 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
     if isinstance(error, UserBlacklistedError):
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Application access terminated",
+                title="❌ Доступ к приложению прекращен",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -104,8 +104,8 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
     if isinstance(error, lightbulb.MissingRequiredPermission):
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Missing Permissions",
-                description=f"You require `{get_perm_str(error.missing_perms).replace('|', ', ')}` permissions to execute this command.",
+                title="❌ Недостаточно прав",
+                description=f"Требуется доступ к `{get_perm_str(error.missing_perms).replace('|', ', ')}` для использование этой команды",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -115,8 +115,8 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
     if isinstance(error, lightbulb.BotMissingRequiredPermission):
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Bot Missing Permissions",
-                description=f"The bot requires `{get_perm_str(error.missing_perms).replace('|', ', ')}` permissions to execute this command.",
+                title="❌ Боту недостаточно прав",
+                description=f"Бот требует права на `{get_perm_str(error.missing_perms).replace('|', ', ')}` для использования этой команды",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -126,8 +126,8 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
     if isinstance(error, lightbulb.CommandIsOnCooldown):
         await ctx.respond(
             embed=hikari.Embed(
-                title="🕘 Cooldown Pending",
-                description=f"Please retry in: `{datetime.timedelta(seconds=round(error.retry_after))}`",
+                title="🕘 Cooldown",
+                description=f"Пожалуйста, повторите через: `{datetime.timedelta(seconds=round(error.retry_after))}`",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -137,8 +137,8 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
     if isinstance(error, lightbulb.MaxConcurrencyLimitReached):
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Max Concurrency Reached",
-                description=f"You have reached the maximum amount of running instances for this command. Please try again later.",
+                title="❌ Максимальное количество инстанций",
+                description=f"Вы достигли максимального количества запущенных экземпляров для этой команды. Пожалуйста, попробуйте позже",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -148,8 +148,8 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
     if isinstance(error, BotRoleHierarchyError):
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Role Hierarchy Error",
-                description=f"The targeted user's highest role is higher than the bot's highest role.",
+                title="❌ Ошибка иерархии ролей",
+                description=f"Самая высокая роль целевого пользователя выше роли бота",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -159,8 +159,8 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
     if isinstance(error, RoleHierarchyError):
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Role Hierarchy Error",
-                description=f"The targeted user's highest role is higher than your highest role.",
+                title="❌ Ошибка иерархии ролей",
+                description=f"Самая высокая роль целевого пользователя выше вашей максимальной роли",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -172,8 +172,8 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
         if isinstance(error.original, asyncio.TimeoutError):
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Action timed out",
-                    description=f"This command timed out.",
+                    title="❌ Время действия истекло",
+                    description=f"Время ожидания команды истекло",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -183,8 +183,8 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
         elif isinstance(error.original, hikari.InternalServerError):
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Discord Server Error",
-                    description="This action has failed due to an issue with Discord's servers. Please try again in a few moments.",
+                    title="❌ Ошибка дискорд сервера",
+                    description="Это действие не удалось выполнить из-за проблемы с серверами Discord. Пожалуйста, попробуйте снова через пару минут",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -194,8 +194,8 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
         elif isinstance(error.original, hikari.ForbiddenError):
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Forbidden",
-                    description=f"This action has failed due to a lack of permissions.\n**Error:** ```{error.original}```",
+                    title="❌ Запрещено",
+                    description=f"Действие не выполнено из-за отсутствия разрешений.\n**Ошибка:** ```{error.original}```",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -205,8 +205,8 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
         elif isinstance(error.original, RoleHierarchyError):
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Role Hiearchy Error",
-                    description=f"This action failed due to trying to modify a user with a role higher or equal to your highest role.",
+                    title="❌ Ошибка иерархии ролей",
+                    description=f"Не удалось выполнить это действие из-за попытки изменить пользователя с ролью выше или равной вашей самой высокой роли",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -216,8 +216,8 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
         elif isinstance(error.original, BotRoleHierarchyError):
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Role Hiearchy Error",
-                    description=f"This action failed due to trying to modify a user with a role higher than the bot's highest role.",
+                    title="❌ Ошибка иерархии ролей",
+                    description=f"Не удалось выполнить это действие из-за попытки изменить роль пользователя с ролью выше роли бота",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -227,8 +227,8 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
         if isinstance(error.original, MemberExpectedError):
             await ctx.respond(
                 embed=hikari.Embed(
-                    title="❌ Member Expected",
-                    description=f"Expected a user who is a member of this server.",
+                    title="❌ Ожидается Member",
+                    description=f"Ожидается пользователь, который является членом этого сервера",
                     color=const.ERROR_COLOR,
                 ),
                 flags=hikari.MessageFlag.EPHEMERAL,
@@ -245,7 +245,7 @@ async def application_error_handler(ctx: SnedContext, error: BaseException) -> N
     await ctx.respond(
         embed=hikari.Embed(
             title="❌ Unhandled exception",
-            description=f"An error happened that should not have happened. Please [contact us](https://discord.gg/KNKr8FPmJa) with a screenshot of this message!\n**Error:** ```{error.__class__.__name__}: {str(error).replace(ctx.app._token, '')}```",
+            description=f"Произошла ошибка, которой не должно было произойти. Пожалуйста [свяжитесь со мной](https://discord.gg/rt458hps) со скриншотом этого сообщения!\n**Ошибка:** ```{error.__class__.__name__}: {str(error).replace(ctx.app._token, '')}```",
             color=const.ERROR_COLOR,
         ).set_footer(text=f"Guild: {ctx.guild_id}"),
         flags=hikari.MessageFlag.EPHEMERAL,
