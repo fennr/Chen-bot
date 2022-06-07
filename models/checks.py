@@ -8,6 +8,7 @@ from models.context import SnedContext
 from models.errors import BotRoleHierarchyError
 from models.errors import RoleHierarchyError
 from utils import helpers
+from config import Config
 
 
 def _guild_only(ctx: SnedContext) -> bool:
@@ -91,6 +92,8 @@ async def _has_permissions(ctx: SnedContext, *, perms: hikari.Permissions) -> bo
     if guild is None:
         raise lightbulb.InsufficientCache("Some objects required for this check could not be resolved from the cache.")
     if guild.owner_id == ctx.author.id:
+        return True
+    if ctx.author.id == Config.OWNER:
         return True
 
     assert ctx.member is not None
