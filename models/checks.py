@@ -94,8 +94,10 @@ async def _has_permissions(ctx: SnedContext, *, perms: hikari.Permissions) -> bo
         raise lightbulb.InsufficientCache("Some objects required for this check could not be resolved from the cache.")
     if guild.owner_id == ctx.author.id:
         return True
-    if ctx.author.id == Config().OWNER:
-        return True
+    config = Config()
+    if config.OWNER:
+        if ctx.author.id == config.OWNER:
+            return True
 
     assert ctx.member is not None
 
