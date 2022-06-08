@@ -413,7 +413,7 @@ async def edit(ctx: ChenSlashContext, message_link: str) -> None:
         )
         return
 
-    modal = miru.Modal(f"Отредактировать сообщение в #{channel.name}")
+    modal = miru.Modal(f"Редактирование сообщения")
     modal.add_item(
         miru.TextInput(
             label="Контент",
