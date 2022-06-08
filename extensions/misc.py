@@ -363,8 +363,8 @@ async def echo(ctx: ChenSlashContext, text: str, channel: t.Optional[hikari.Inte
     ),
     has_permissions(hikari.Permissions.MANAGE_MESSAGES),
 )
-@lightbulb.option("message_link", "Можно получить кликнов правой кнопкой мыши по сообщению", type=str)
-@lightbulb.command("edit", "Отредактировать сообщение отправленное ботом.", pass_options=True)
+@lightbulb.option("message_link", "Ссылка на сообщение", type=str)
+@lightbulb.command("edit", "Отредактировать сообщение отправленное ботом", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
 async def edit(ctx: ChenSlashContext, message_link: str) -> None:
 
