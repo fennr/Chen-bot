@@ -109,18 +109,18 @@ async def get_userinfo(ctx: SnedContext, user: hikari.User) -> hikari.Embed:
         comms_disabled_until = member.communication_disabled_until()
 
         embed = hikari.Embed(
-            title=f"**User information:** {member.display_name}",
-            description=f"""**• Username:** `{member}`
-**• Nickname:** `{member.nickname or "-"}`
-**• User ID:** `{member.id}`
-**• Bot:** `{member.is_bot}`
-**• Account creation date:** {format_dt(member.created_at)} ({format_dt(member.created_at, style='R')})
-**• Join date:** {format_dt(member.joined_at)} ({format_dt(member.joined_at, style='R')})
+            title=f"**Информация о пользователе:** {member.display_name}",
+            description=f"""**• Пользователь:** `{member}`
+**• Ник:** `{member.nickname or "-"}`
+**• ID:** `{member.id}`
+**• Бот:** `{member.is_bot}`
+**• Дата создания аккаунта:** {format_dt(member.created_at)} ({format_dt(member.created_at, style='R')})
+**• Присоединился:** {format_dt(member.joined_at)} ({format_dt(member.joined_at, style='R')})
 **• Badges:** {"   ".join(get_badges(member)) or "`-`"}
-**• Warns:** `{db_user.warns}`
-**• Timed out:** {f"Until: {format_dt(comms_disabled_until)}" if comms_disabled_until is not None else "`-`"}
-**• Journal:** `{f"{len(db_user.notes)} entries" if db_user.notes else "No entries"}` 
-**• Roles:** {roles}""",
+**• Предупреждений:** `{db_user.warns}`
+**• Таймаут:** {f"Until: {format_dt(comms_disabled_until)}" if comms_disabled_until is not None else "`-`"}
+**• Журнал:** `{f"записей: {len(db_user.notes)}" if db_user.notes else "Нет записей"}` 
+**• Роли:** {roles}""",
             color=get_color(member),
         )
         user = await ctx.app.rest.fetch_user(user.id)
@@ -130,19 +130,19 @@ async def get_userinfo(ctx: SnedContext, user: hikari.User) -> hikari.Embed:
 
     else:
         embed = hikari.Embed(
-            title=f"**User information:** {user.username}",
-            description=f"""**• Username:** `{user}`
-**• Nickname:** `-`
-**• User ID:** `{user.id}`
-**• Bot:** `{user.is_bot}`
-**• Account creation date:** {format_dt(user.created_at)} ({format_dt(user.created_at, style='R')})
-**• Join date:** `-`
+            title=f"**Информация о пользователе:** {user.username}",
+            description=f"""**• Пользователь:** `{user}`
+**• Ник:** `-`
+**• ID:** `{user.id}`
+**• Бот:** `{user.is_bot}`
+**• Дата создания аккаунта:** {format_dt(user.created_at)} ({format_dt(user.created_at, style='R')})
+**• Присоединился:** `-`
 **• Badges:** {"   ".join(get_badges(user)) or "`-`"}
-**• Warns:** `{db_user.warns}`
-**• Timed out:** `-`
-**• Journal:** `{f"{len(db_user.notes)} entries" if db_user.notes else "No entries"}`
-**• Roles:** `-`
-*Note: This user is not a member of this server*""",
+**• Предупреждений:** `{db_user.warns}`
+**• Таймаут:** `-`
+**• Журнал:** `{f"записей: {len(db_user.notes)}" if db_user.notes else "Нет записей"}`
+**• Роли:** `-`
+*Заметка: Этот пользователь не находится на сервере*""",
             color=const.EMBED_BLUE,
         )
         embed.set_thumbnail(user.display_avatar_url)
@@ -298,8 +298,8 @@ async def parse_message_link(ctx: ChenSlashContext, message_link: str) -> Option
     if not MESSAGE_LINK_REGEX.fullmatch(message_link):
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid link",
-                description="This does not appear to be a valid message link! You can get a message's link by right-clicking it and selecting `Copy Message Link`!",
+                title="❌ Некорректная ссылка",
+                description="Недействительная ссылка сообщения. Для получения ссылки, щелки правой кнопкой по сообщению и выбери `Копировать ссылку на сообщение`",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -314,8 +314,8 @@ async def parse_message_link(ctx: ChenSlashContext, message_link: str) -> Option
     if ctx.guild_id != guild_id:
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Invalid link",
-                description="The message seems to be from another server! Please copy a message link from this server!",
+                title="❌ Некорректная ссылка",
+                description="Сообщение с другого сервера! Скопируй ссылку на сообщение с этого сервера",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -336,8 +336,8 @@ async def parse_message_link(ctx: ChenSlashContext, message_link: str) -> Option
     except (hikari.NotFoundError, hikari.ForbiddenError):
         await ctx.respond(
             embed=hikari.Embed(
-                title="❌ Unknown message",
-                description="Could not find message with this link. Ensure the link is valid, and that the bot has permissions to view the channel.",
+                title="❌ Неизвестное сообщение",
+                description="Не удалось найти сообщение с этой ссылкой. Убедитесь, что ссылка действительна и что у бота есть разрешения на просмотр канала",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
@@ -381,7 +381,7 @@ def format_reason(
         The formatted reason
     """
     if not reason:
-        reason = "No reason provided."
+        reason = "Причина не указана"
 
     if moderator:
         # This format must remain the same, as the userlog extension depends on it for author parsing.
@@ -401,7 +401,7 @@ def build_note_pages(notes: t.List[str]) -> t.List[hikari.Embed]:
 
     embeds = [
         hikari.Embed(
-            title="📒 " + "Journal entries for this user:",
+            title="📒 " + "Записи журнала для пользователя:",
             description=page,
             color=const.EMBED_BLUE,
         )
