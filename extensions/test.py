@@ -16,6 +16,7 @@ from utils import helpers
 logger = logging.getLogger(__name__)
 
 test = ChenPlugin("Test")
+test.add_checks(lightbulb.owner_only)
 
 
 @test.listener(hikari.StartedEvent)
@@ -170,12 +171,12 @@ async def test_cmd(ctx: ChenSlashContext) -> None:
 
 
 def load(bot: ChenBot) -> None:
-    # bot.add_plugin(test)
+    bot.add_plugin(test)
     pass
 
 
 def unload(bot: ChenBot) -> None:
-    # bot.remove_plugin(test)
+    bot.remove_plugin(test)
     pass
 
 

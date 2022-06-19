@@ -13,7 +13,7 @@ from etc import constants as const
 from etc.perms_str import get_perm_str
 from models import SnedContext
 from models.bot import ChenBot
-from models.context import SnedPrefixContext
+from models.context import ChenPrefixContext
 from models.context import ChenSlashContext
 from models.errors import BotRoleHierarchyError
 from models.errors import MemberExpectedError
@@ -312,7 +312,7 @@ async def prefix_command_invoke_listener(event: lightbulb.PrefixCommandInvocatio
         if not helpers.includes_permissions(lightbulb.utils.permissions_for(me), hikari.Permissions.ADD_REACTIONS):
             return
 
-    assert isinstance(event.context, SnedPrefixContext)
+    assert isinstance(event.context, ChenPrefixContext)
     await event.context.event.message.add_reaction("▶️")
 
 

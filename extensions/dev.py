@@ -14,7 +14,7 @@ from miru.ext import nav
 
 from etc import constants as const
 from models import AuthorOnlyNavigator
-from models import SnedPrefixContext
+from models import ChenPrefixContext
 from models.bot import ChenBot
 from models.plugin import ChenPlugin
 from models.views import AuthorOnlyView
@@ -65,7 +65,7 @@ def format_output(text: str) -> str:
 
 
 async def send_paginated(
-    ctx: SnedPrefixContext,
+    ctx: ChenPrefixContext,
     messageable: hikari.SnowflakeishOr[t.Union[hikari.TextableChannel, hikari.User]],
     text: str,
     *,
@@ -114,7 +114,7 @@ async def send_paginated(
     await navmenu.send(channel_id)
 
 
-async def run_shell(ctx: SnedPrefixContext, code: str) -> None:
+async def run_shell(ctx: ChenPrefixContext, code: str) -> None:
     """
     Run code in shell and return output to Discord.
     """
@@ -147,7 +147,7 @@ async def run_shell(ctx: SnedPrefixContext, code: str) -> None:
 @lightbulb.option("extension_name", "The name of the extension to reload.")
 @lightbulb.command("reload", "Reload an extension.", pass_options=True)
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def reload_cmd(ctx: SnedPrefixContext, extension_name: str) -> None:
+async def reload_cmd(ctx: ChenPrefixContext, extension_name: str) -> None:
     ctx.app.reload_extensions(extension_name)
     await ctx.event.message.add_reaction("✅")
     await ctx.respond(f"🔃 `{extension_name}`")
@@ -157,7 +157,7 @@ async def reload_cmd(ctx: SnedPrefixContext, extension_name: str) -> None:
 @lightbulb.option("extension_name", "The name of the extension to load.")
 @lightbulb.command("load", "Load an extension.", pass_options=True)
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def load_cmd(ctx: SnedPrefixContext, extension_name: str) -> None:
+async def load_cmd(ctx: ChenPrefixContext, extension_name: str) -> None:
     ctx.app.load_extensions(extension_name)
     await ctx.event.message.add_reaction("✅")
     await ctx.respond(f"📥 `{extension_name}`")
@@ -167,7 +167,7 @@ async def load_cmd(ctx: SnedPrefixContext, extension_name: str) -> None:
 @lightbulb.option("extension_name", "The name of the extension to unload.")
 @lightbulb.command("unload", "Unload an extension.", pass_options=True)
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def unload_cmd(ctx: SnedPrefixContext, extension_name: str) -> None:
+async def unload_cmd(ctx: ChenPrefixContext, extension_name: str) -> None:
     ctx.app.unload_extensions(extension_name)
     await ctx.event.message.add_reaction("✅")
     await ctx.respond(f"📤 `{extension_name}`")
@@ -177,7 +177,7 @@ async def unload_cmd(ctx: SnedPrefixContext, extension_name: str) -> None:
 @lightbulb.option("code", "Code to execute.", modifier=lightbulb.OptionModifier.CONSUME_REST)
 @lightbulb.command("py", "Run code.", pass_options=True)
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def eval_py(ctx: SnedPrefixContext, code: str) -> None:
+async def eval_py(ctx: ChenPrefixContext, code: str) -> None:
 
     globals_dict = {
         "_author": ctx.author,
@@ -241,7 +241,7 @@ def unload(bot: ChenBot) -> None:
 @lightbulb.option("code", "Code to execute.", modifier=lightbulb.OptionModifier.CONSUME_REST)
 @lightbulb.command("sh", "Run code.", pass_options=True)
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def eval_sh(ctx: SnedPrefixContext, code: str) -> None:
+async def eval_sh(ctx: ChenPrefixContext, code: str) -> None:
 
     await run_shell(ctx, code)
 
@@ -250,7 +250,7 @@ async def eval_sh(ctx: SnedPrefixContext, code: str) -> None:
 @lightbulb.option("code", "Code to execute.", modifier=lightbulb.OptionModifier.CONSUME_REST)
 @lightbulb.command("git", "Run git commands.", pass_options=True)
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def dev_git_pull(ctx: SnedPrefixContext, code: str) -> None:
+async def dev_git_pull(ctx: ChenPrefixContext, code: str) -> None:
     await run_shell(ctx, f"git {code}")
 
 
@@ -260,7 +260,7 @@ async def dev_git_pull(ctx: SnedPrefixContext, code: str) -> None:
 )
 @lightbulb.command("sync", "Sync application commands.")
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def resync_app_cmds(ctx: SnedPrefixContext) -> None:
+async def resync_app_cmds(ctx: ChenPrefixContext) -> None:
     await ctx.app.rest.trigger_typing(ctx.channel_id)
     if ctx.options["--force"]:
         await ctx.app.purge_application_commands(*ctx.app.default_enabled_guilds, global_commands=True)
@@ -273,7 +273,7 @@ async def resync_app_cmds(ctx: SnedPrefixContext) -> None:
 @dev.command
 @lightbulb.command("sql", "Execute an SQL file")
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def run_sql(ctx: SnedPrefixContext) -> None:
+async def run_sql(ctx: ChenPrefixContext) -> None:
     if not ctx.attachments or not ctx.attachments[0].filename.endswith(".sql"):
         await ctx.respond(
             embed=hikari.Embed(
@@ -294,7 +294,7 @@ async def run_sql(ctx: SnedPrefixContext) -> None:
 @dev.command
 @lightbulb.command("shutdown", "Shut down the bot.")
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def shutdown_cmd(ctx: SnedPrefixContext) -> None:
+async def shutdown_cmd(ctx: ChenPrefixContext) -> None:
     confirm_payload = {"content": f"⚠️ Shutting down...", "components": []}
     cancel_payload = {"content": "❌ Shutdown cancelled", "components": []}
     confirmed = await ctx.confirm(
@@ -311,7 +311,7 @@ async def shutdown_cmd(ctx: SnedPrefixContext) -> None:
 @dev.command
 @lightbulb.command("pg_dump", "Back up the database.", aliases=["dbbackup", "backup"])
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def backup_db_cmd(ctx: SnedPrefixContext) -> None:
+async def backup_db_cmd(ctx: ChenPrefixContext) -> None:
     await ctx.app.backup_db()
     await ctx.event.message.add_reaction("✅")
     await ctx.respond("📤 Database backup complete.")
@@ -321,7 +321,7 @@ async def backup_db_cmd(ctx: SnedPrefixContext) -> None:
 @lightbulb.option("--ignore-errors", "Ignore all errors.", type=bool, default=False)
 @lightbulb.command("pg_restore", "Restore database from attached dump file.", aliases=["restore"])
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def restore_db(ctx: SnedPrefixContext) -> None:
+async def restore_db(ctx: ChenPrefixContext) -> None:
     if not ctx.attachments or not ctx.attachments[0].filename.endswith(".pgdmp"):
         await ctx.respond(
             embed=hikari.Embed(
@@ -382,7 +382,7 @@ async def restore_db(ctx: SnedPrefixContext) -> None:
 @lightbulb.option("mode", "The mode of operation.", type=str)
 @lightbulb.command("blacklist", "Commands to manage the blacklist.", pass_options=True)
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def blacklist_cmd(ctx: SnedPrefixContext, mode: str, user: hikari.User) -> None:
+async def blacklist_cmd(ctx: ChenPrefixContext, mode: str, user: hikari.User) -> None:
     if user.id == ctx.user.id:
         await ctx.event.message.add_reaction("❌")
         await ctx.respond("❌ Cannot blacklist self")
@@ -420,7 +420,7 @@ async def blacklist_cmd(ctx: SnedPrefixContext, mode: str, user: hikari.User) ->
 @lightbulb.option("guild_id", "The guild_id to reset all settings for.", type=int)
 @lightbulb.command("resetsettings", "Reset all settings for the specified guild.", pass_options=True)
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def resetsettings_cmd(ctx: SnedPrefixContext, guild_id: int) -> None:
+async def resetsettings_cmd(ctx: ChenPrefixContext, guild_id: int) -> None:
     guild = ctx.app.cache.get_guild(guild_id)
 
     if not guild:

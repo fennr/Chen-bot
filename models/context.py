@@ -10,7 +10,7 @@ from models.mod_actions import ModerationFlags
 
 from .views import AuthorOnlyView
 
-__all__ = ["SnedContext", "ChenSlashContext", "ChenMessageContext", "ChenUserContext", "SnedPrefixContext"]
+__all__ = ["SnedContext", "ChenSlashContext", "ChenMessageContext", "ChenUserContext", "ChenPrefixContext"]
 
 if t.TYPE_CHECKING:
     from .bot import ChenBot
@@ -187,7 +187,7 @@ class ChenMessageContext(SnedContext, lightbulb.MessageContext):
     """Custom MessageContext for Sned."""
 
 
-class SnedPrefixContext(SnedContext, lightbulb.PrefixContext):
+class ChenPrefixContext(SnedContext, lightbulb.PrefixContext):
     """Custom PrefixContext for Sned."""
 
 

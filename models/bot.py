@@ -243,8 +243,8 @@ class ChenBot(lightbulb.BotApp):
         return await super().get_message_context(event, command, cls)  # type: ignore
 
     async def get_prefix_context(
-        self, event: hikari.MessageCreateEvent, cls: t.Type[lightbulb.PrefixContext] = SnedPrefixContext
-    ) -> t.Optional[SnedPrefixContext]:
+        self, event: hikari.MessageCreateEvent, cls: t.Type[lightbulb.PrefixContext] = ChenPrefixContext
+    ) -> t.Optional[ChenPrefixContext]:
         return await super().get_prefix_context(event, cls)  # type: ignore
 
     async def on_guild_available(self, event: hikari.GuildAvailableEvent) -> None:
