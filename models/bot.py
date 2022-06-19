@@ -106,7 +106,7 @@ class ChenBot(lightbulb.BotApp):
             cache_settings=cache_settings,
             default_enabled_guilds=default_enabled_guilds,
             intents=intents,
-            owner_ids=(163979124820541440,),
+            owner_ids=(196583204164075520,),
             prefix="dev",
             help_class=None,
             banner=None,
