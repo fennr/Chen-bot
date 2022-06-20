@@ -487,9 +487,9 @@ async def emoji(ctx: ChenSlashContext, message_link: str, count: int, zero: bool
     assert isinstance(send_to, hikari.TextableGuildChannel) and me is not None
 
     perms = lightbulb.utils.permissions_in(send_to, me)
-    if not helpers.includes_permissions(perms, hikari.Permissions.SEND_MESSAGES | hikari.Permissions.VIEW_CHANNEL):
+    if not helpers.includes_permissions(perms, hikari.Permissions.SEND_MESSAGES & hikari.Permissions.VIEW_CHANNEL):
         raise lightbulb.BotMissingRequiredPermission(
-            perms=hikari.Permissions.SEND_MESSAGES | hikari.Permissions.VIEW_CHANNEL
+            perms=hikari.Permissions.SEND_MESSAGES & hikari.Permissions.VIEW_CHANNEL
         )
     else:
         raw_numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
