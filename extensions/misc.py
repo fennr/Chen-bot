@@ -513,6 +513,55 @@ async def raw(ctx: ChenMessageContext, target: hikari.Message) -> None:
 
 
 @misc.command
+@lightbulb.option("zero", "Включая ноль?", type=bool, default=False)
+@lightbulb.option("count", "До какого числа нумерация", type=int, required=True)
+@lightbulb.option("message_link", "Ссылка на сообщение", type=str, required=True)
+@lightbulb.command("emoji", "Добавить нумерованные эмодзи", pass_options=True)
+@lightbulb.implements(lightbulb.SlashCommand)
+async def emoji(ctx: ChenSlashContext, message_link: str, count: int, zero: bool) -> None:
+
+    message = await helpers.parse_message_link(ctx, message_link)
+    if not message:
+        return
+
+    assert ctx.guild_id is not None
+
+    channel = ctx.app.cache.get_guild_channel(message.channel_id) or await ctx.app.rest.fetch_channel(
+        message.channel_id
+    )
+
+    me = ctx.app.cache.get_member(ctx.guild_id, ctx.app.user_id)
+
+    send_to = (ctx.app.cache.get_guild_channel(channel.id) or ctx.get_channel()) if channel else ctx.get_channel()
+
+    assert isinstance(send_to, hikari.TextableGuildChannel) and me is not None
+
+    perms = lightbulb.utils.permissions_in(send_to, me)
+    if not helpers.includes_permissions(perms, hikari.Permissions.SEND_MESSAGES):
+        raise lightbulb.BotMissingRequiredPermission(
+            perms=hikari.Permissions.SEND_MESSAGES
+        )
+
+    raw_numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+
+    if zero:
+        numbers = raw_numbers[:count]
+    else:
+        numbers = raw_numbers[1:count+1]
+
+    task = asyncio.create_task(utils.helpers.add_emoji(message, numbers))
+
+    await ctx.respond(
+        embed=hikari.Embed(
+            title="✅ Эмоции добавлены!",
+            color=const.EMBED_GREEN),
+        flags=hikari.MessageFlag.EPHEMERAL,
+    )
+
+    await task
+
+
+@misc.command
 @lightbulb.option("timezone", "Часовой пояс, который будет установлен по-умолчанию. Example: 'Europe/Kiev'", autocomplete=True)
 @lightbulb.command(
     "timezone", "Устанавливает часовой пояс для других команд, связанных со временем.", pass_options=True
