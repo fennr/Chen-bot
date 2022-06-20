@@ -116,7 +116,7 @@ async def get_userinfo(ctx: SnedContext, user: hikari.User) -> hikari.Embed:
 **• Бот:** `{member.is_bot}`
 **• Дата создания аккаунта:** {format_dt(member.created_at)} ({format_dt(member.created_at, style='R')})
 **• Присоединился:** {format_dt(member.joined_at)} ({format_dt(member.joined_at, style='R')})
-**• Badges:** {"   ".join(get_badges(member)) or "`-`"}
+**• Сквад:** {"   ".join(get_badges(member)) or "`-`"}
 **• Предупреждений:** `{db_user.warns}`
 **• Таймаут:** {f"Until: {format_dt(comms_disabled_until)}" if comms_disabled_until is not None else "`-`"}
 **• Журнал:** `{f"записей: {len(db_user.notes)}" if db_user.notes else "Нет записей"}` 
@@ -137,7 +137,7 @@ async def get_userinfo(ctx: SnedContext, user: hikari.User) -> hikari.Embed:
 **• Бот:** `{user.is_bot}`
 **• Дата создания аккаунта:** {format_dt(user.created_at)} ({format_dt(user.created_at, style='R')})
 **• Присоединился:** `-`
-**• Badges:** {"   ".join(get_badges(user)) or "`-`"}
+**• Сквад:** {"   ".join(get_badges(user)) or "`-`"}
 **• Предупреждений:** `{db_user.warns}`
 **• Таймаут:** `-`
 **• Журнал:** `{f"записей: {len(db_user.notes)}" if db_user.notes else "Нет записей"}`
@@ -155,7 +155,7 @@ async def get_userinfo(ctx: SnedContext, user: hikari.User) -> hikari.Embed:
     if ctx.member.id in ctx.app.owner_ids:
         records = await ctx.app.db_cache.get(table="blacklist", user_id=user.id, limit=1)
         is_blacklisted = True if records and records[0]["user_id"] == user.id else False
-        embed.description = f"{embed.description}\n**• Blacklisted:** `{is_blacklisted}`"
+        embed.description = f"{embed.description}\n**• Заблокирован:** `{is_blacklisted}`"
 
     return embed
 

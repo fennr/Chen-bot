@@ -295,10 +295,10 @@ async def run_sql(ctx: ChenPrefixContext) -> None:
 @lightbulb.command("shutdown", "Shut down the bot.")
 @lightbulb.implements(lightbulb.PrefixCommand)
 async def shutdown_cmd(ctx: ChenPrefixContext) -> None:
-    confirm_payload = {"content": f"⚠️ Shutting down...", "components": []}
-    cancel_payload = {"content": "❌ Shutdown cancelled", "components": []}
+    confirm_payload = {"content": f"⚠️ Отключается...", "components": []}
+    cancel_payload = {"content": "❌ Отключение преостановлено", "components": []}
     confirmed = await ctx.confirm(
-        "Are you sure you want to shut down the application?",
+        "Вы действительно хотите отключить бота?",
         confirm_payload=confirm_payload,
         cancel_payload=cancel_payload,
     )
@@ -399,7 +399,7 @@ async def blacklist_cmd(ctx: ChenPrefixContext, mode: str, user: hikari.User) ->
         await ctx.app.db.execute("""INSERT INTO blacklist (user_id) VALUES ($1)""", user.id)
         await ctx.app.db_cache.refresh(table="blacklist", user_id=user.id)
         await ctx.event.message.add_reaction("✅")
-        await ctx.respond("✅ User added to blacklist")
+        await ctx.respond("✅ Пользователь добавлен в черный список")
     elif mode.casefold() in ["del", "delete", "remove"]:
         if not records:
             await ctx.event.message.add_reaction("❌")
@@ -409,11 +409,11 @@ async def blacklist_cmd(ctx: ChenPrefixContext, mode: str, user: hikari.User) ->
         await ctx.app.db.execute("""DELETE FROM blacklist WHERE user_id = $1""", user.id)
         await ctx.app.db_cache.refresh(table="blacklist", user_id=user.id)
         await ctx.event.message.add_reaction("✅")
-        await ctx.respond("✅ User removed from blacklist")
+        await ctx.respond("✅ Пользователь удален из черного списка")
 
     else:
         await ctx.event.message.add_reaction("❌")
-        await ctx.respond("❌ Invalid mode\nValid modes:`add`, `del`.")
+        await ctx.respond("❌ Некорректный параметр\nВыберите:`add`, `del`.")
 
 
 @dev.command
