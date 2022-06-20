@@ -89,9 +89,9 @@ async def hotswiki(ctx: ChenSlashContext, query: str, wiki: str = "heroesofthest
     try:
         results = await search_fandom(f"{wiki}", query)
         embed = hikari.Embed(
-            title=f"HotS {wiki} Wiki: {query}",
+            title=f"HotS Wiki: {query}",
             description=results,
-            color=(218, 166, 100),
+            color=(36, 211, 252),
         )
     except ValueError:
         embed = hikari.Embed(
@@ -120,7 +120,7 @@ async def hkwiki(ctx: ChenSlashContext, query: str) -> None:
         embed = hikari.Embed(
             title=f"Hollow Knight Wiki: {query}",
             description=results,
-            color=(75, 170, 147),
+            color=(250, 251, 246),
         )
     except ValueError:
         embed = hikari.Embed(
