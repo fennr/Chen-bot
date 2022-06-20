@@ -480,14 +480,12 @@ async def emoji(ctx: ChenSlashContext, message_link: str, count: int, zero: bool
         message.channel_id
     )
 
-    me = ctx.app.cache.get_member(ctx.guild_id, ctx.app.user_id)
+    assert isinstance(channel, hikari.TextableGuildChannel) is not None
 
-    assert isinstance(channel.id, hikari.TextableGuildChannel) and me is not None
-
-    perms = lightbulb.utils.permissions_in(channel, me)
-    if not helpers.includes_permissions(perms, hikari.Permissions.SEND_MESSAGES & hikari.Permissions.VIEW_CHANNEL):
-        raise lightbulb.BotMissingRequiredPermission(
-            perms=hikari.Permissions.SEND_MESSAGES & hikari.Permissions.VIEW_CHANNEL
+    perms = lightbulb.utils.permissions_in(channel, ctx.member)
+    if not helpers.includes_permissions(perms, hikari.Permissions.SEND_MESSAGES):
+        raise lightbulb.MissingRequiredPermission(
+            perms=hikari.Permissions.SEND_MESSAGES
         )
     else:
         raw_numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
