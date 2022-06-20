@@ -482,11 +482,9 @@ async def emoji(ctx: ChenSlashContext, message_link: str, count: int, zero: bool
 
     me = ctx.app.cache.get_member(ctx.guild_id, ctx.app.user_id)
 
-    send_to = ctx.app.cache.get_guild_channel(channel.id) if channel else ctx.get_channel()
+    assert isinstance(channel.id, hikari.TextableGuildChannel) and me is not None
 
-    assert isinstance(send_to, hikari.TextableGuildChannel) and me is not None
-
-    perms = lightbulb.utils.permissions_in(send_to, me)
+    perms = lightbulb.utils.permissions_in(channel, me)
     if not helpers.includes_permissions(perms, hikari.Permissions.SEND_MESSAGES & hikari.Permissions.VIEW_CHANNEL):
         raise lightbulb.BotMissingRequiredPermission(
             perms=hikari.Permissions.SEND_MESSAGES & hikari.Permissions.VIEW_CHANNEL
