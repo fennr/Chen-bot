@@ -1,30 +1,26 @@
-# Sned
+# Chen
 
-> Sned is a general purpose Discord bot designed to make handling your community a breeze!
+> Чень - дискорд бот, разработанный для удобной модерации сообществ с функциями на русском языке
 
-### [Add it to your server!](https://discord.com/oauth2/authorize?client_id=817730141722902548&permissions=1494984682710&scope=applications.commands%20bot)
+### [Добавить на свой сервер!](https://discord.com/oauth2/authorize?client_id=661443692447662102&permissions=1494984682710&scope=applications.commands%20bot)
 
-### Main features:
-- Powerful moderation commands
-- Intuitive settings menu
-- AutoMod
-- Report system for users to anonymously report messages to your team
-- Customizable logging to keep moderators accountable
-- Toxicity filtering via [Perspective](https://www.perspectiveapi.com/)
-- Rolebuttons for letting users pick their roles
-- Starboard
-- Tags system
-- Reminders with snoozing and additional recipient support
-- Fun commands such as tic-tac-toe and typeracer
-- Much much more!
+### Основные функции:
+- Удобные модерационные команды с множеством настроек
+- Отдельное меню настроек бота для сервера
+- Система репортов
+- Настраиваемая система логгирования действий на сервере
+- Создание кнопок для получения ролей
+- Теги для хранения полезной информации, вместо закрепления
+- Напоминания с удобной установкой времени
+- И многое другое
 
 
-### Sned in action:
+### Chen  в действии:
 
-| Moderation tools | Settings & configuration | Rolebuttons | Reminders |
-| ----------- | ----------- | ----------- | ----------- |
-| ![Powerful moderation commands!](https://cdn.discordapp.com/attachments/836300326172229672/952785998138466364/unknown.png) | ![Intuitive Settings and Configuration](https://cdn.discordapp.com/attachments/836300326172229672/952786784666931300/unknown.png) | ![Rolebuttons in action](https://cdn.discordapp.com/attachments/836300326172229672/952789779471294464/unknown.png) | ![Reminder snoozing in action](https://cdn.discordapp.com/attachments/836300326172229672/952790270150320228/unknown.png) |
+| Модерация                                              | Настройки под сервер                                                                                       | Кнопки ролей                                     | Напоминания                                                |
+|--------------------------------------------------------|------------------------------------------------------------------------------------------------------------|--------------------------------------------------|------------------------------------------------------------|
+| ![Удаление сообщений](https://i.imgur.com/0YvVsh8.png) | ![Меню настроек](https://i.imgur.com/UgQQ3BL.png) | ![Кнопки ролей](https://i.imgur.com/YQ8Mse9.png) | ![Напоминания в действии](https://i.imgur.com/Yw996fe.png) |
 
-### Configuration:
+### Настройка:
 
-To get started with setting up the bot on a server you have `Manage Server` permissions on, simply type `/settings`!
+Для настройки необходимо иметь на сервере права `Manage Server` и набрать `/settings`!
