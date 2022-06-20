@@ -437,6 +437,59 @@ async def edit(ctx: ChenSlashContext, message_link: str) -> None:
     )
 
 
+@lightbulb.option("message_link", "Ссылка на сообщение", type=str, required=True)
+@lightbulb.option("count", "До какого числа нумерация", type=int, required=True)
+@lightbulb.option("zero", "Включая ноль?", type=bool, default=False)
+@lightbulb.command("emoji", "Добавить нумерованные эмодзи", pass_options=True)
+@lightbulb.implements(lightbulb.SlashCommand)
+async def edit(ctx: ChenSlashContext, message_link: str, count: int, zero: bool) -> None:
+
+    message = await helpers.parse_message_link(ctx, message_link)
+    if not message:
+        return
+
+    assert ctx.guild_id is not None
+
+    channel = ctx.app.cache.get_guild_channel(message.channel_id) or await ctx.app.rest.fetch_channel(
+        message.channel_id
+    )
+
+    me = ctx.app.cache.get_member(ctx.guild_id, ctx.app.user_id)
+
+    overwrites_channel = (
+        channel
+        if not isinstance(channel, hikari.GuildThreadChannel)
+        else ctx.app.cache.get_guild_channel(channel.parent_id)
+    )
+    assert (
+        isinstance(channel, (hikari.TextableGuildChannel))
+        and me is not None
+        and isinstance(overwrites_channel, hikari.GuildChannel)
+    )
+
+    perms = lightbulb.utils.permissions_in(overwrites_channel, me)
+    if not helpers.includes_permissions(
+        perms,
+        hikari.Permissions.SEND_MESSAGES | hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.READ_MESSAGE_HISTORY,
+    ):
+        raise lightbulb.BotMissingRequiredPermission(
+            perms=hikari.Permissions.SEND_MESSAGES
+            | hikari.Permissions.VIEW_CHANNEL
+            | hikari.Permissions.READ_MESSAGE_HISTORY
+        )
+
+    raw_numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+    if zero:
+        numbers = raw_numbers[:count]
+    else:
+        numbers = raw_numbers[1:count+1]
+    for number in numbers:
+        await message.add_reaction(number)
+
+    await ctx.respond(
+        embed=hikari.Embed(title="✅ Реакции добавлены!", color=const.EMBED_GREEN), flags=hikari.MessageFlag.EPHEMERAL
+    )
+
 @misc.command
 @lightbulb.add_checks(
     bot_has_permissions(
