@@ -145,7 +145,7 @@ async def hkwiki(ctx: ChenSlashContext, query: str) -> None:
 async def stswiki(ctx: ChenSlashContext, query: str) -> None:
     await ctx.respond(hikari.ResponseType.DEFERRED_MESSAGE_CREATE)
     try:
-        results = await search_fandom("Slay the Spire", query)
+        results = await search_fandom("slay-the-spire", query)
         embed = hikari.Embed(
             title=f"Slay the Spire Wiki: {query}",
             description=results,
