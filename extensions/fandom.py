@@ -133,6 +133,34 @@ async def hkwiki(ctx: ChenSlashContext, query: str) -> None:
     await ctx.respond(embed=embed)
 
 
+@fandom.command
+@lightbulb.option("query", "Что вы ищите?")
+@lightbulb.command(
+    "stswiki",
+    "Поиск по статьям шпиля",
+    pass_options=True,
+    guilds=Config().DEBUG_GUILDS or (642852514865217578, 124864790110797824),
+)
+@lightbulb.implements(lightbulb.SlashCommand)
+async def stswiki(ctx: ChenSlashContext, query: str) -> None:
+    await ctx.respond(hikari.ResponseType.DEFERRED_MESSAGE_CREATE)
+    try:
+        results = await search_fandom("Slay the Spire", query)
+        embed = hikari.Embed(
+            title=f"Slay the Spire Wiki: {query}",
+            description=results,
+            color=(255, 201, 29),
+        )
+    except ValueError:
+        embed = hikari.Embed(
+            title="❌ Не найдено",
+            description=f"Ничего не найдено по запросу `{query}`",
+            color=const.ERROR_COLOR,
+        )
+    except RuntimeError as e:
+        embed = hikari.Embed(title="❌ Сетевая ошибка", description=f"```{e}```", color=const.ERROR_COLOR)
+    await ctx.respond(embed=embed)
+
 def load(bot: ChenBot) -> None:
     bot.add_plugin(fandom)
 
