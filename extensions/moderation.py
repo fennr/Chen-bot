@@ -184,7 +184,7 @@ async def journal_get(ctx: ChenSlashContext, user: hikari.User) -> None:
     else:
         await ctx.mod_respond(
             embed=hikari.Embed(
-                title="📒 Записи журнала для пользователя:",
+                title=f"📒 Записи журнала для пользователя {user}:",
                 description=f"Для этого пользователя нет записей в журнале. Добавить вручную можно командой `/journal add {ctx.options.user}`",
                 color=const.EMBED_BLUE,
             )
