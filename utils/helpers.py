@@ -13,7 +13,7 @@ import lightbulb
 from etc import constants as const
 from models import errors
 from models.components import *
-from models.context import SnedContext
+from models.context import ChenContext
 from models.context import ChenSlashContext
 from models.db_user import DatabaseUser
 
@@ -93,7 +93,7 @@ def get_badges(user: hikari.User) -> List[str]:
     return [emoji for flag, emoji in BADGE_EMOJI_MAPPING.items() if flag & user.flags]
 
 
-async def get_userinfo(ctx: SnedContext, user: hikari.User) -> hikari.Embed:
+async def get_userinfo(ctx: ChenContext, user: hikari.User) -> hikari.Embed:
 
     if not ctx.guild_id:
         raise RuntimeError("Cannot use get_userinfo outside of a guild.")

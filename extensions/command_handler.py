@@ -11,7 +11,7 @@ import lightbulb
 
 from etc import constants as const
 from etc.perms_str import get_perm_str
-from models import SnedContext
+from models import ChenContext
 from models.bot import ChenBot
 from models.context import ChenPrefixContext
 from models.context import ChenSlashContext
@@ -74,7 +74,7 @@ async def log_exc_to_channel(
             logging.error(f"Failed sending traceback to error-logging channel: {error}")
 
 
-async def application_error_handler(ctx: SnedContext, error: BaseException) -> None:
+async def application_error_handler(ctx: ChenContext, error: BaseException) -> None:
 
     if isinstance(error, lightbulb.CheckFailure):
         error = error.causes[0] if error.causes else error.__cause__ if error.__cause__ else error

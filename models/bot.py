@@ -39,12 +39,12 @@ async def get_prefix(bot: lightbulb.BotApp, message: hikari.Message) -> t.Union[
     return "sn "
 
 
-async def is_not_blacklisted(ctx: SnedContext) -> bool:
+async def is_not_blacklisted(ctx: ChenContext) -> bool:
     """Evaluate if the user is blacklisted or not.
 
     Parameters
     ----------
-    ctx : SnedContext
+    ctx : ChenContext
         The context to evaluate under.
 
     Returns
