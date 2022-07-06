@@ -55,8 +55,6 @@ class Tag(DatabaseModel):
             sql = "SELECT * FROM tags WHERE tagname = $1 AND guild_id = $2 OR $1 = ANY(aliases) AND guild_id = $2"
 
         record = await cls._db.fetchrow(sql, name.lower(), guild_id)
-        print(sql)
-        print(record)
         if not record:
             return
 
@@ -91,13 +89,13 @@ class Tag(DatabaseModel):
         guild_id = hikari.Snowflake(guild)
         # TODO: Figure out how to fuzzymatch within arrays via SQL
         results = await cls._db.fetch("""SELECT tagname, aliases FROM tags WHERE guild_id = $1""", guild_id)
-
         names = [result.get("tagname") for result in results] if results else []
-
         if results is not None:
             names += list(chain(*[result.get("aliases") or [] for result in results]))
-
-        return get_close_matches(name, names)
+        if len(name) > 0:
+            return get_close_matches(name, names)
+        else:
+            return names
 
     @classmethod
     async def fetch_closest_owned_names(
