@@ -4,7 +4,7 @@ import operator
 import hikari
 import lightbulb
 
-from models.context import SnedContext
+from models.context import ChenContext
 from models.errors import BotRoleHierarchyError
 from models.errors import RoleHierarchyError
 from utils import helpers
@@ -12,14 +12,14 @@ from config import Config
 
 config = Config()
 
-def _guild_only(ctx: SnedContext) -> bool:
+def _guild_only(ctx: ChenContext) -> bool:
     if not ctx.guild_id:
         raise lightbulb.OnlyInGuild("This command can only be used in a guild.")
     return True
 
 
 @lightbulb.Check  # type: ignore
-async def is_above_target(ctx: SnedContext) -> bool:
+async def is_above_target(ctx: ChenContext) -> bool:
     """Check if the targeted user is above the bot's top role or not.
     Used in the moderation extension."""
 
@@ -51,7 +51,7 @@ async def is_above_target(ctx: SnedContext) -> bool:
 
 
 @lightbulb.Check  # type: ignore
-async def is_invoker_above_target(ctx: SnedContext) -> bool:
+async def is_invoker_above_target(ctx: ChenContext) -> bool:
     """Check if the targeted user is above the invoker's top role or not.
     Used in the moderation extension."""
 
@@ -81,7 +81,7 @@ async def is_invoker_above_target(ctx: SnedContext) -> bool:
     raise RoleHierarchyError("Target user top role is higher than author.")
 
 
-async def _has_permissions(ctx: SnedContext, *, perms: hikari.Permissions) -> bool:
+async def _has_permissions(ctx: ChenContext, *, perms: hikari.Permissions) -> bool:
     _guild_only(ctx)
     try:
         channel, guild = (ctx.get_channel() or await ctx.app.rest.fetch_channel(ctx.channel_id)), ctx.get_guild()
@@ -114,7 +114,7 @@ async def _has_permissions(ctx: SnedContext, *, perms: hikari.Permissions) -> bo
     return True
 
 
-async def _bot_has_permissions(ctx: SnedContext, *, perms: hikari.Permissions) -> bool:
+async def _bot_has_permissions(ctx: ChenContext, *, perms: hikari.Permissions) -> bool:
     _guild_only(ctx)
     try:
         channel, guild = (ctx.get_channel() or await ctx.app.rest.fetch_channel(ctx.channel_id)), ctx.get_guild()

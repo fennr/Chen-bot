@@ -8,7 +8,7 @@ import miru
 from etc import constants as const
 from models import ChenSlashContext
 from models.bot import ChenBot
-from models.context import SnedContext
+from models.context import ChenContext
 from models.context import ChenMessageContext
 from models.context import ChenUserContext
 from models.plugin import ChenPlugin
@@ -57,7 +57,7 @@ class ReportModal(miru.Modal):
         await ctx.defer(flags=hikari.MessageFlag.EPHEMERAL)
 
 
-async def report_error(ctx: SnedContext) -> None:
+async def report_error(ctx: ChenContext) -> None:
     guild = ctx.get_guild()
     assert guild is not None
 
@@ -71,7 +71,7 @@ async def report_error(ctx: SnedContext) -> None:
     )
 
 
-async def report_perms_error(ctx: SnedContext) -> None:
+async def report_perms_error(ctx: ChenContext) -> None:
     await ctx.respond(
         embed=hikari.Embed(
             title="❌ Ошибка",
@@ -82,7 +82,7 @@ async def report_perms_error(ctx: SnedContext) -> None:
     )
 
 
-async def report(ctx: SnedContext, member: hikari.Member, message: t.Optional[hikari.Message] = None) -> None:
+async def report(ctx: ChenContext, member: hikari.Member, message: t.Optional[hikari.Message] = None) -> None:
 
     assert ctx.member is not None and ctx.guild_id is not None
 

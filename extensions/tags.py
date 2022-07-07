@@ -96,9 +96,9 @@ async def tag_cmd(ctx: ChenSlashContext, name: str, ephemeral: bool = False) -> 
 async def tag_name_ac(
     option: hikari.AutocompleteInteractionOption, interaction: hikari.AutocompleteInteraction
 ) -> t.List[str]:
-    if option.value and interaction.guild_id:
-        return (await Tag.fetch_closest_names(str(option.value), interaction.guild_id)) or []
-    return []
+    #if option.value and interaction.guild_id:
+    return (await Tag.fetch_closest_names(str(option.value), interaction.guild_id)) or []
+    #return []
 
 
 @tags.command

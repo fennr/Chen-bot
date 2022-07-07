@@ -10,7 +10,7 @@ import hikari
 from models.db import DatabaseModel
 
 if t.TYPE_CHECKING:
-    from models.context import SnedContext
+    from models.context import ChenContext
 
 
 @attr.define()
@@ -55,7 +55,6 @@ class Tag(DatabaseModel):
             sql = "SELECT * FROM tags WHERE tagname = $1 AND guild_id = $2 OR $1 = ANY(aliases) AND guild_id = $2"
 
         record = await cls._db.fetchrow(sql, name.lower(), guild_id)
-
         if not record:
             return
 
@@ -90,13 +89,13 @@ class Tag(DatabaseModel):
         guild_id = hikari.Snowflake(guild)
         # TODO: Figure out how to fuzzymatch within arrays via SQL
         results = await cls._db.fetch("""SELECT tagname, aliases FROM tags WHERE guild_id = $1""", guild_id)
-
         names = [result.get("tagname") for result in results] if results else []
-
         if results is not None:
             names += list(chain(*[result.get("aliases") or [] for result in results]))
-
-        return get_close_matches(name, names)
+        if len(name) > 0:
+            return get_close_matches(name, names)
+        else:
+            return names
 
     @classmethod
     async def fetch_closest_owned_names(
@@ -252,12 +251,12 @@ class Tag(DatabaseModel):
             self.content,
         )
 
-    def parse_content(self, ctx: SnedContext) -> str:
+    def parse_content(self, ctx: ChenContext) -> str:
         """Parse a tag's contents and substitute any variables with data.
 
         Parameters
         ----------
-        ctx : SnedContext
+        ctx : ChenContext
             The context to evaluate variables under.
 
         Returns
