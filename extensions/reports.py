@@ -178,7 +178,7 @@ async def report_cmd(ctx: ChenSlashContext, user: hikari.Member) -> None:
 
 
 @reports.command
-@lightbulb.command("Report User", "Сообщить о пользователе модераторам", pass_options=True)
+@lightbulb.command("Сообщить о нарушении", "Сообщить о пользователе модераторам", pass_options=True)
 @lightbulb.implements(lightbulb.UserCommand)
 async def report_user_cmd(ctx: ChenUserContext, target: hikari.Member) -> None:
     helpers.is_member(target)
