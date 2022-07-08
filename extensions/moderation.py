@@ -37,7 +37,7 @@ async def whois(ctx: ChenSlashContext, user: hikari.User) -> None:
 
 
 @mod.command
-@lightbulb.command("Show Userinfo", "Показать пользовательскую информацию о пользователе", pass_options=True)
+@lightbulb.command("Показать профиль", "Показать пользовательскую информацию о пользователе", pass_options=True)
 @lightbulb.implements(lightbulb.UserCommand)
 async def whois_user_command(ctx: ChenUserContext, target: hikari.User) -> None:
     embed = await helpers.get_userinfo(ctx, target)
