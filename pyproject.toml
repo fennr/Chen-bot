@@ -28,7 +28,6 @@ Brotli = "~=1.0"
 kosu = {git = "https://github.com/HyperGH/kosu.git", branch="main"}
 hikari-lightbulb = {git = "https://github.com/HyperGH/hikari-lightbulb.git", branch="development"}
 hikari-miru = {git = "https://github.com/HyperGH/hikari-miru.git", branch="cursed/branch"}
-lavasnek_rs = {git = "https://github.com/vicky5124/lavasnek_rs", branch="master"}
 
 [tool.poetry.dev-dependencies]
 black = "^22.3"
