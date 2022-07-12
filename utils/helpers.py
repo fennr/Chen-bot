@@ -410,9 +410,13 @@ def build_note_pages(notes: t.List[str]) -> t.List[hikari.Embed]:
     return embeds
 
 
-async def add_emoji(message: hikari.PartialMessage, emojis: list) -> None:
+async def add_emoji(message: hikari.PartialMessage, emojis: list, custom: bool = False) -> None:
     for emoji in emojis:
-        await message.add_reaction(emoji)
+        if custom:
+            name, id = emoji[2:-1].split(':')
+            await message.add_reaction(name, int(id))
+        else:
+            await message.add_reaction(emoji)
 
 # Copyright (C) 2022-present HyperGH
 
