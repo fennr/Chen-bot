@@ -464,11 +464,24 @@ async def raw(ctx: ChenMessageContext, target: hikari.Message) -> None:
 
 @misc.command
 @lightbulb.option("zero", "Включая ноль?", type=bool, default=False)
-@lightbulb.option("count", "До какого числа нумерация", type=int, required=True)
+@lightbulb.option("count", "До какого числа нумерация", type=int, default=4)
+@lightbulb.option(
+    "emoji",
+    "Свои эмодзи",
+    required=False,
+    type=t.List[hikari.CustomEmoji]
+)
+@lightbulb.option(
+    "type",
+    "Вид эмодзи",
+    required=True,
+    choices=["likes", "numbers", "raw"]
+)
 @lightbulb.option("message_link", "Ссылка на сообщение", type=str, required=True)
 @lightbulb.command("emoji", "Добавить нумерованные эмодзи", pass_options=True)
 @lightbulb.implements(lightbulb.SlashCommand)
-async def emoji(ctx: ChenSlashContext, message_link: str, count: int, zero: bool) -> None:
+async def emoji(ctx: ChenSlashContext, type: t.Optional[str], emoji:t.Optional[str],
+                message_link: str, count: int, zero: bool) -> None:
 
     message = await helpers.parse_message_link(ctx, message_link)
     if not message:
@@ -488,14 +501,20 @@ async def emoji(ctx: ChenSlashContext, message_link: str, count: int, zero: bool
             perms=hikari.Permissions.SEND_MESSAGES
         )
     else:
-        raw_numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
-
-        if zero:
-            numbers = raw_numbers[:count]
+        custom = False
+        if type == "numbers":
+            raw_numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+            if zero:
+                emojis = raw_numbers[:count]
+            else:
+                emojis = raw_numbers[1:count+1]
+        elif type == "likes":
+            emojis = ['👍', '👎']
         else:
-            numbers = raw_numbers[1:count+1]
+            emojis = emoji.split()
+            custom = True
 
-        task = asyncio.create_task(utils.helpers.add_emoji(message, numbers))
+        task = asyncio.create_task(utils.helpers.add_emoji(message, emojis, custom))
 
         await ctx.respond(
             embed=hikari.Embed(
