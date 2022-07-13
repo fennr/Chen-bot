@@ -130,12 +130,12 @@ async def embed(ctx: ChenSlashContext) -> None:
         return
 
     if ctx.member and not helpers.includes_permissions(
-        lightbulb.utils.permissions_for(ctx.member), hikari.Permissions.SEND_MESSAGES
+        lightbulb.utils.permissions_for(ctx.member), hikari.Permissions.MANAGE_MESSAGES
     ):
         await ctx.respond(
             embed=hikari.Embed(
                 title="❌ Отсутствуют права доступа",
-                description=f"Необходимо иметь роль с правами на `Send Messages`",
+                description=f"Необходимо иметь роль с правами на `Manage Messages`",
                 color=const.ERROR_COLOR,
             ),
             flags=hikari.MessageFlag.EPHEMERAL,
