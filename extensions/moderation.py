@@ -514,7 +514,7 @@ async def ban_cmd(
 @lightbulb.option("user", "Пользователь", type=hikari.Member)
 @lightbulb.command(
     "softban",
-    "Софтбан пользователя с удалением его сообщений и разбаном",
+    "Кик пользователя и удаление его сообщений",
     pass_options=True,
 )
 @lightbulb.implements(lightbulb.SlashCommand)

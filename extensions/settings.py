@@ -35,8 +35,6 @@ def get_key(dictionary: dict, value: t.Any) -> t.Any:
 
 
 class SettingsView(models.AuthorOnlyView):
-    """God objects go brr >_<"""
-
     def __init__(
         self,
         lctx: lightbulb.Context,
@@ -47,12 +45,12 @@ class SettingsView(models.AuthorOnlyView):
     ) -> None:
         super().__init__(lctx, timeout=timeout, autodefer=autodefer)
 
-        # Last received context object
+        # Коследний полученный контекст
         self.last_ctx: t.Optional[miru.Context] = None
-        # Last component interacted with
+        # Последний компонент с которым было взаимодействие
         self.last_item: t.Optional[miru.Item] = None
 
-        # Last value received as input
+        # Последнее значение, пришедшее по клику
         self.value: t.Optional[str] = None
         # If True, provides the menu ephemerally
         self.ephemeral: bool = ephemeral
@@ -244,6 +242,7 @@ class SettingsView(models.AuthorOnlyView):
         if not self.value:
             return
 
+        print(self.value)
         if isinstance(self.value, tuple) and self.value[0] == "Активно":
             await self.app.db.execute(
                 """INSERT INTO reports (is_enabled, guild_id)
