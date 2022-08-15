@@ -142,7 +142,9 @@ class SettingsView(models.AuthorOnlyView):
             item.disabled = True
 
         try:
-            await self.last_ctx.edit_response(components=self.build(), flags=self.flags)
+            # await self.last_ctx.edit_response(components=self.build(), flags=self.flags)
+            await self.last_ctx.edit_response(flags=self.flags)
+            await self.last_ctx.interaction.delete_message(self.last_ctx.interaction.message)
         except hikari.NotFoundError:
             pass
 
