@@ -1,25 +1,25 @@
 # Privacy Policy:
 
-_By using Sned, you agree to Discord's [Terms of Service](https://discord.com/terms)_
+_By using Chen, you agree to Discord's [Terms of Service](https://discord.com/terms)_
 
 ---
 
 
 ## 1. What Information do we collect:
 
-Sned retains a little information about users as possible.
+Chen retains a little information about users as possible.
 
 What we do collect, and store persistently are:
 
 - Your Discord [Snowflake](https://discord.dev/reference#snowflakes)
-- The ID of guilds where Sned is used
+- The ID of guilds where Chen is used
 - Certain user-submitted content
 - Certain user-submitted preferences (e.g. timezone)
 - A list of moderation actions performed on users (journal)
 
 ## 2. Why do we store this information?
 
-Sned provides multiple services that action upon users (either first or second party individuals). 
+Chen provides multiple services that action upon users (either first or second party individuals). 
 
 Because of the asyncrhonous nature of these services, and the requirement of a context to act within, it's a requisite to know what guild, and who the actions are targeted toward.
 
@@ -47,34 +47,34 @@ Your discord ID is provided by Discord's [API](https://discord.dev).
 
 Under normal circumstances, this information is not stored persistently, nor for any extended period of time in temporary storage.
 
-We may collect this information temporarily or indefinitely under certain circumstances, under the restriction that you have been involved with Sned and it's services, directly or indirectly. 
+We may collect this information temporarily or indefinitely under certain circumstances, under the restriction that you have been involved with Chen and it's services, directly or indirectly. 
 
-Moderators of any server that has authorized Sned to operate on their guild may pass your user ID as an argument to a service provided by Sned, which may require storing it persistently.
+Moderators of any server that has authorized Chen to operate on their guild may pass your user ID as an argument to a service provided by Chen, which may require storing it persistently.
 
-Alternatively some services provided by Sned accessible to non-moderators may store information about you (such as your ID). This information is as restrictive as possible, bearing only enough context to provide core functionality to the aforementioned services.
+Alternatively some services provided by Chen accessible to non-moderators may store information about you (such as your ID). This information is as restrictive as possible, bearing only enough context to provide core functionality to the aforementioned services.
 
 
 ## 4. What is this information used for?
 
-Information stored by Sned is only used for the purposes stated by the related service it is used for. This information is never shared with third parties, and only leaves the confines of the service when it is required by a first-party entity.
+Information stored by Chen is only used for the purposes stated by the related service it is used for. This information is never shared with third parties, and only leaves the confines of the service when it is required by a first-party entity.
 
-Some of Sned's services use persistently stored data to be sent back to the user at a later time.
+Some of Chen's services use persistently stored data to be sent back to the user at a later time.
 
 Furthermore, storing Discord identifiers (IDs, Snowflakes) allows for robust error analysis that would otherwise be inacessible or otherwise infeasible. 
 
 By storing this information, it enables us to not only improve upon the product being offered to the end user posthaste, but contact users and/or server owners if necessary. 
 
-It also allows users to contact us in regards to issues that may occur with Sned, so that they may be linked with a corresponding log or metric recorded by Sned for these diagnostic purposes.
+It also allows users to contact us in regards to issues that may occur with Chen, so that they may be linked with a corresponding log or metric recorded by Chen for these diagnostic purposes.
 
-The use of IDs links end users to certain metadata held about them, both from Discord and tracked internally by Sned's services. Sned may, if configured, act atonomously on this metadata should configured circumstances be met. Metadata attached to users is deleted in a cascading manner, and is removed should the user's primary entity be removed from our data stores for any reason.
+The use of IDs links end users to certain metadata held about them, both from Discord and tracked internally by Chen's services. Chen may, if configured, act atonomously on this metadata should configured circumstances be met. Metadata attached to users is deleted in a cascading manner, and is removed should the user's primary entity be removed from our data stores for any reason.
 
 ## 5. How to be informed when this policy updates:
 
-Should this policy be updated in the future, for any reason, an announcement will be made on Sned's [Discord Server](https://discord.gg/KNKr8FPmJa).
+Should this policy be updated in the future, for any reason, an announcement will be made on Chen's [Discord Server](https://discord.gg/KNKr8FPmJa).
 
 ## 6. Contacting:
 
-Any questions or concerns can be answered via Discord, and joining Sned's [Discord Server](https://discord.gg/KNKr8FPmJa)
+Any questions or concerns can be answered via Discord, and joining Chen's [Discord Server](https://discord.gg/KNKr8FPmJa)
 
 ## 7. How is user information protected?
 Both temporary and persistent data stores are located on a remote server.

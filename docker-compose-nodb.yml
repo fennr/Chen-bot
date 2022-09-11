@@ -1,6 +1,6 @@
 services:
 
-  sned:
+  chen:
     build:
         context: .
         dockerfile: Dockerfile

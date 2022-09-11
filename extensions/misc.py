@@ -203,7 +203,7 @@ async def about(ctx: ChenSlashContext) -> None:
             description=f"""**• Made by:** `fenrir#5455`
 **• Servers:** `{len(ctx.app.cache.get_guilds_view())}`
 **• Invite:** [Invite me!](https://discord.com/oauth2/authorize?client_id={me.id}&permissions=1494984682710&scope=bot%20applications.commands)
-**• Support:** [Click here!](https://discord.gg/qxy6WE9cke)""",
+**• Support:** [Click here!]({const.HELP_LINK})""",
             color=const.EMBED_BLUE,
         )
         .set_thumbnail(me.avatar_url)
@@ -275,7 +275,7 @@ async def setnick(ctx: ChenSlashContext, nickname: t.Optional[str] = None) -> No
 @lightbulb.command("support", "Задать вопросы относительно бота")
 @lightbulb.implements(lightbulb.SlashCommand)
 async def support(ctx: ChenSlashContext) -> None:
-    await ctx.respond("https://discord.gg/qxy6WE9cke", flags=hikari.MessageFlag.EPHEMERAL)
+    await ctx.respond(f"{const.HELP_LINK}", flags=hikari.MessageFlag.EPHEMERAL)
 
 
 @misc.command

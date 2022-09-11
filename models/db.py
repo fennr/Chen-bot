@@ -24,8 +24,8 @@ class Database:
     def __init__(self, app: ChenBot) -> None:
         self._app: ChenBot = app
         self._user = os.getenv("POSTGRES_USER") or "postgres"
-        self._host = os.getenv("POSTGRES_HOST") or "sned-db"
-        self._db_name = os.getenv("POSTGRES_DB") or "sned"
+        self._host = os.getenv("POSTGRES_HOST") or "chen-db"
+        self._db_name = os.getenv("POSTGRES_DB") or "chen"
         self._port = int(os.getenv("POSTGRES_PORT") or 5432)
         self._password = os.environ["POSTGRES_PASSWORD"]
         self._version = os.getenv("POSTGRES_VERSION")

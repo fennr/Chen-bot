@@ -1,4 +1,4 @@
--- Migration of schema from Sned V1
+-- Migration of schema from Chen V1
 
 
 -- Obsolete or removed functionality

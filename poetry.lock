@@ -311,7 +311,7 @@ reference = "main"
 resolved_reference = "428c8477c947927d0b0ed3f6818a9c275d900b66"
 
 [[package]]
-name = "levenshtein"
+name = "samurohtein"
 version = "0.18.1"
 description = "Python extension for computing string edit distances and similarities."
 category = "main"
@@ -960,7 +960,7 @@ jarowinkler = [
     {file = "jarowinkler-1.0.4.tar.gz", hash = "sha256:540e3f14ac80b3851ba77cf0c57d5142cc35c93fdd03fdbb5da2445049066a5f"},
 ]
 kosu = []
-levenshtein = [
+samurohtein = [
     {file = "Levenshtein-0.18.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:cdb13e975cc23d927fdef2edda6635b43e420abd351be049abd5049e9c678bda"},
     {file = "Levenshtein-0.18.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:28b43dde3a0606b8834a807b035565bb7926a1461dccc8e47d303d24e94e3748"},
     {file = "Levenshtein-0.18.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:18f1976ed2e834bf77e4d4b18b0d403496c7b39573e027d774c2c5b2842a7732"},

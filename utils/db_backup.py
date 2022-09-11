@@ -12,9 +12,9 @@ async def backup_database() -> hikari.File:
 
     username: str = os.getenv("POSTGRES_USER") or "postgres"
     password: str = os.getenv("POSTGRES_PASSWORD") or ""
-    hostname: str = os.getenv("POSTGRES_HOST") or "sned-db"
+    hostname: str = os.getenv("POSTGRES_HOST") or "chen-db"
     port: str = os.getenv("POSTGRES_PORT") or "5432"
-    db_name: str = os.getenv("POSTGRES_DB") or "sned"
+    db_name: str = os.getenv("POSTGRES_DB") or "chen"
 
     os.environ["PGPASSWORD"] = password
 

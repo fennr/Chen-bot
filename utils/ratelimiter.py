@@ -25,7 +25,7 @@ class BucketType(enum.IntEnum):
 
 class RateLimiter:
     def __init__(self, period: float, limit: int, bucket: BucketType, wait: bool = True) -> None:
-        """Rate Limiter implementation for Sned
+        """Rate Limiter implementation for Chen
 
         Parameters
         ----------

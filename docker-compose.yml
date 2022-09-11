@@ -1,13 +1,13 @@
 services:
 
-  sned-db:
+  chen-db:
     image: postgres:${POSTGRES_VERSION:-14}
     restart: always
     expose:
       - $POSTGRES_PORT:-5432
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-sned}
+      POSTGRES_DB: ${POSTGRES_DB:-chen}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?err}
     volumes:
@@ -15,7 +15,7 @@ services:
     networks:
       - private
 
-  sned:
+  chen:
     build:
         context: .
         dockerfile: Dockerfile
@@ -23,7 +23,7 @@ services:
           postgres_version: ${POSTGRES_VERSION:-14}
     command: ["python3.10", "-O", "main.py"]
     depends_on:
-      - sned-db
+      - chen-db
     restart: always
     networks:
       - private

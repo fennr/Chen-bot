@@ -42,7 +42,7 @@ class AuthorOnlyView(miru.View):
         return ctx.user.id == self.lctx.author.id
 
 
-class SnedNavigator(nav.NavigatorView):
+class ChenNavigator(nav.NavigatorView):
     def __init__(
         self,
         *,
@@ -61,7 +61,7 @@ class SnedNavigator(nav.NavigatorView):
         super().__init__(pages=pages, buttons=buttons, timeout=timeout, autodefer=autodefer)
 
 
-class AuthorOnlyNavigator(SnedNavigator):
+class AuthorOnlyNavigator(ChenNavigator):
     """
     A navigator that only works for the user who invoked it.
     """

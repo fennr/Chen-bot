@@ -176,19 +176,19 @@ class ChenContext(lightbulb.Context):
 
 
 class ChenSlashContext(ChenContext, lightbulb.SlashContext):
-    """Custom SlashContext for Sned."""
+    """Custom SlashContext for Chen."""
 
 
 class ChenUserContext(ChenContext, lightbulb.UserContext):
-    """Custom UserContext for Sned."""
+    """Custom UserContext for Chen."""
 
 
 class ChenMessageContext(ChenContext, lightbulb.MessageContext):
-    """Custom MessageContext for Sned."""
+    """Custom MessageContext for Chen."""
 
 
 class ChenPrefixContext(ChenContext, lightbulb.PrefixContext):
-    """Custom PrefixContext for Sned."""
+    """Custom PrefixContext for Chen."""
 
 
 # Copyright (C) 2022-present HyperGH

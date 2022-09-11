@@ -3,7 +3,7 @@ import typing as t
 import attr
 
 """
-Configuration file example for the Discord bot Sned.
+Configuration file example for the Discord bot Chen.
 The actual configuration is read from 'config.py', which must exist.
 All secrets are stored and read from the .env file.
 """

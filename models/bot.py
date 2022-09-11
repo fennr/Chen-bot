@@ -332,7 +332,7 @@ class ChenBot(lightbulb.BotApp):
                 await event.message.respond(
                     embed=hikari.Embed(
                         title="О нет!",
-                        description="Этот бот использует только слеш-команды `/`!\nЕсли у вас есть вопросы можно написать мне на [Samuro dev сервер](https://discord.gg/qxy6WE9cke)!",
+                        description=f"Этот бот использует только слеш-команды `/`!\nЕсли у вас есть вопросы можно написать мне на [Samuro dev сервер]({const.HELP_LINK})!",
                         color=const.ERROR_COLOR,
                     ).set_thumbnail(user.avatar_url if user else None)
                 )

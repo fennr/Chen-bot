@@ -12,7 +12,7 @@ if t.TYPE_CHECKING:
     from models.rolebutton import RoleButton
 
 
-class SnedEvent(hikari.Event):
+class ChenEvent(hikari.Event):
     """
     Base event for any custom event implemented by this application.
     """
@@ -20,7 +20,7 @@ class SnedEvent(hikari.Event):
     ...
 
 
-class SnedGuildEvent(SnedEvent):
+class ChenGuildEvent(ChenEvent):
     """
     Base event for any custom event that occurs within the context of a guild.
     """
@@ -69,7 +69,7 @@ class SnedGuildEvent(SnedEvent):
 
 
 @attr.define()
-class TimerCompleteEvent(SnedGuildEvent):
+class TimerCompleteEvent(ChenGuildEvent):
     """
     Dispatched when a scheduled timer has expired.
     """
@@ -80,7 +80,7 @@ class TimerCompleteEvent(SnedGuildEvent):
 
 
 @attr.define()
-class MassBanEvent(SnedGuildEvent):
+class MassBanEvent(ChenGuildEvent):
     """
     Dispatched when a massban occurs.
     """
@@ -95,7 +95,7 @@ class MassBanEvent(SnedGuildEvent):
 
 
 @attr.define()
-class WarnEvent(SnedGuildEvent):
+class WarnEvent(ChenGuildEvent):
     """
     Base class for all warning events.
     """
@@ -136,7 +136,7 @@ class WarnsClearEvent(WarnEvent):
 
 
 @attr.define()
-class AutoModMessageFlagEvent(SnedGuildEvent):
+class AutoModMessageFlagEvent(ChenGuildEvent):
     """
     Dispatched when a message is flagged by auto-mod.
     """
@@ -149,7 +149,7 @@ class AutoModMessageFlagEvent(SnedGuildEvent):
 
 
 @attr.define()
-class RoleButtonEvent(SnedGuildEvent):
+class RoleButtonEvent(ChenGuildEvent):
     """
     Base class for all rolebutton-related events.
     """

@@ -245,7 +245,7 @@ async def application_error_handler(ctx: ChenContext, error: BaseException) -> N
     await ctx.respond(
         embed=hikari.Embed(
             title="❌ Unhandled exception",
-            description=f"Произошла ошибка, которой не должно было произойти. Пожалуйста [свяжитесь со мной](https://discord.gg/rt458hps) со скриншотом этого сообщения!\n**Ошибка:** ```{error.__class__.__name__}: {str(error).replace(ctx.app._token, '')}```",
+            description=f"Произошла ошибка, которой не должно было произойти. Пожалуйста [свяжитесь со мной]({const.HELP_LINK}) со скриншотом этого сообщения!\n**Ошибка:** ```{error.__class__.__name__}: {str(error).replace(ctx.app._token, '')}```",
             color=const.ERROR_COLOR,
         ).set_footer(text=f"Guild: {ctx.guild_id}"),
         flags=hikari.MessageFlag.EPHEMERAL,

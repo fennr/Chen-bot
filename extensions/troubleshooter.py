@@ -92,14 +92,14 @@ async def troubleshoot(ctx: ChenSlashContext) -> None:
     if not content:
         embed = hikari.Embed(
             title="✅ Проблем с правами не найдено",
-            description="Если вы все же столкнулись с проблемой, напишите мне на [сервер Samuro_dev](https://discord.gg/qxy6WE9cke)",
+            description=f"Если вы все же столкнулись с проблемой, напишите мне на [сервер Samuro_dev]({const.HELP_LINK})",
             color=const.EMBED_GREEN,
         )
     else:
         content = "\n".join(content)
         embed = hikari.Embed(
             title="О, нет!",
-            description=f"Похоже, что боту не хватает прав для выполнения некоторых действий\n\n{content}\n\nЕсли вы не можете самостоятельно решить проблему, напишите мне на [сервер Samuro_dev](https://discord.gg/qxy6WE9cke)",
+            description=f"Похоже, что боту не хватает прав для выполнения некоторых действий\n\n{content}\n\nЕсли вы не можете самостоятельно решить проблему, напишите мне на [сервер Samuro_dev]({const.HELP_LINK})",
             color=const.ERROR_COLOR,
         )
 

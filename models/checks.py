@@ -12,6 +12,7 @@ from config import Config
 
 config = Config()
 
+
 def _guild_only(ctx: ChenContext) -> bool:
     if not ctx.guild_id:
         raise lightbulb.OnlyInGuild("This command can only be used in a guild.")

@@ -20,11 +20,11 @@ help_embeds = {
     # Default no topic help
     None: hikari.Embed(
         title="ℹ️ __Help__",
-        description="""**Привет, это помощь по использованию бота Chen!**
+        description=f"""**Привет, это помощь по использованию бота Chen!**
             
 Чтобы начать использовать бота, набери `/` чтобы увидеть все доступные команды! Чтобы посмотреть справку по нескольким особенностям можно рабрать `/help topic_name`.
 
-Если нужна помощь или вы обнаружили баг, можно написать на [Samuro_dev сервер](https://discord.gg/rt458hps)!
+Если нужна помощь или вы обнаружили баг, можно написать на [Samuro_dev сервер]({const.HELP_LINK})!
 
 Thank you for using Chen!""",
         color=const.EMBED_BLUE,
@@ -32,7 +32,7 @@ Thank you for using Chen!""",
     # Default no topic help for people with manage guild perms
     "admin_home": hikari.Embed(
         title="ℹ️ __Help__",
-        description="""**Это хелп по использованию команд бота Chen**
+        description=f"""**Это хелп по использованию команд бота Chen**
             
 Чтобы начать использовать бота набери `/` чтобы увидеть все доступные команды! Несколько дополнительных настроек можно изучить командами `/help topic_name`.
 
@@ -40,7 +40,7 @@ Thank you for using Chen!""",
 
 Проверить, что бот корректно настроен можно командой `/troubleshoot`.
 
-Если нужна помощь или вы обнаружили баг, можно написать на [Samuro_dev сервер](https://discord.gg/rt458hps)!
+Если нужна помощь или вы обнаружили баг, можно написать на [Samuro_dev сервер]({const.HELP_LINK})!
 
 """,
         color=const.EMBED_BLUE,
