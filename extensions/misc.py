@@ -46,6 +46,13 @@ async def ping(ctx: ChenSlashContext) -> None:
 @misc.command
 @lightbulb.option("detach", "Отправить как отдельное сообщение", type=bool, required=False)
 @lightbulb.option(
+    "channel",
+    "Канал для отправки сообщения. По-умолчанию текущий канал",
+    required=False,
+    type=hikari.TextableGuildChannel,
+    channel_types=[hikari.ChannelType.GUILD_TEXT, hikari.ChannelType.GUILD_NEWS],
+)
+@lightbulb.option(
     "color",
     "Цвет. Ожидается 3 RGB значения через пробел",
     type=hikari.Color,
@@ -79,6 +86,8 @@ async def ping(ctx: ChenSlashContext) -> None:
 @lightbulb.command("embed", "Сгенерировать новое embed-сообщение с параметрами")
 @lightbulb.implements(lightbulb.SlashCommand)
 async def embed(ctx: ChenSlashContext) -> None:
+    send_to = (ctx.app.cache.get_guild_channel(ctx.options.channel.id) or ctx.channel_id) if ctx.options.channel else ctx.channel_id
+
     url_options = [
         ctx.options.image_url,
         ctx.options.thumbnail_url,
@@ -166,7 +175,7 @@ async def embed(ctx: ChenSlashContext) -> None:
                 perms=hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.SEND_MESSAGES
             )
 
-    await ctx.app.rest.create_message(ctx.channel_id, embed=embed)
+    await ctx.app.rest.create_message(send_to, embed=embed)
     await ctx.respond(
         embed=hikari.Embed(title="✅ Embed создан!", color=const.EMBED_GREEN), flags=hikari.MessageFlag.EPHEMERAL
     )
